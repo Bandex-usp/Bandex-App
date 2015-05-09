@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Bandejão Melhor</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_quimica">Química</string>
+    <string name="title_central">Central</string>
+    <string name="title_fisica">Física</string>
+
+    <string name="title_menu">Cardápio</string>
+    <string name="title_ratings_average">Média das notas para a Fila</string>
+    <string name="title_last_status">Último status há</string>
+    <string name="title_minutes">minutos</string>
+
+    <string name="title_pick_a_place">Escolha um local</string>
+    <string name="title_rate_this_line">Dê uma nota para a fila</string>
+    <string name="title_send">Enviar</string>
+
+    <string name="title_evaluate_line">Avaliar Fila</string>
+    <string name="title_more_details">Mais detalhes</string>
+    <string name="title_great_line">Fila Ótima</string>
+    <string name="title_good_line">Fila Boa</string>
+    <string name="title_regular_line">Fila Média</string>
+    <string name="title_bad_line">Fila Ruim</string>
+    <string name="title_horrible_line">Fila Péssima</string>
+    <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
+
+    <string name="title_foo">foo foo</string>
+    <string name="title_activity_more_details">Mais detalhes</string>
+
+    <string name="title_activity_evaluate_line">Avaliação da Fila</string>
+
+
+
+
+
+
+
+
+
+</resources>
