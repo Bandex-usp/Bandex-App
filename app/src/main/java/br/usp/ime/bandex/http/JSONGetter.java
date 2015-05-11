@@ -1,4 +1,4 @@
-package br.usp.ime.bandex.parser;
+package br.usp.ime.bandex.http;
 
 /** Adaptado de RAJ AMAL
  * Autor: RAJ AMAL
@@ -20,21 +20,21 @@ import org.json.JSONException;
 
 import android.util.Log;
 
-public class JSONParser {
+public class JSONGetter {
 
     static InputStream is = null;
     static JSONArray jArr = null;
     static String json = "";
 
     // constructor
-    public JSONParser() {
+    public JSONGetter() {
 
     }
 
     /* Returns the JSONArray corresponding to the url
        Returns null if any error occurred, like internet connection down
     */
-    public JSONArray getJSONFromUrl(String url) {
+    public String getJSONFromUrl(String url) {
 
         // Making HTTP request
         try {
@@ -72,16 +72,6 @@ public class JSONParser {
             Log.e("Buffer Error", "Error converting result " + e.toString());
             return null;
         }
-
-        // try parse the string to a JSON array
-        try {
-            jArr = new JSONArray(json);
-        } catch (JSONException e) {
-            Log.e("JSON Parser", "Error parsing data " + e.toString());
-            return null;
-        }
-
-        // returns JSONArray Object
-        return jArr;
+        return json;
     }
 }

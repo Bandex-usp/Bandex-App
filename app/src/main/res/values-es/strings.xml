@@ -15,7 +15,7 @@
     <string name="title_rate_this_line">Dê uma nota para a fila</string>
     <string name="title_send">Enviar</string>
 
-    <string name="title_evaluate_line">Avaliar Fila</string>
+    <string name="title_evaluate_line">Evaluar cola</string>
     <string name="title_more_details">Mais detalhes</string>
     <string name="title_great_line">Fila Ótima</string>
     <string name="title_good_line">Fila Boa</string>
@@ -24,8 +24,6 @@
     <string name="title_horrible_line">Fila Péssima</string>
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
 
-
-    <string name="preferences_menu_cache">menu_cache</string>
     <string name="title_foo">foo foo</string>
     <string name="title_activity_more_details">Mais detalhes</string>
 
