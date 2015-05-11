@@ -30,6 +30,16 @@
     <string name="title_activity_more_details">Mais detalhes</string>
 
     <string name="title_activity_evaluate_line">Avaliação da Fila</string>
+    <string name="title_bandex">Bandejão</string>
+    <string-array name="days_array">
+        <item>Segunda</item>
+        <item>Terça</item>
+        <item>Quarta</item>
+        <item>Quinta</item>
+        <item>Sexta</item>
+        <item>Sábado</item>
+        <item>Domingo</item>
+    </string-array>
 
 
 

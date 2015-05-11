@@ -36,11 +36,12 @@ import br.usp.ime.bandex.tasks.GetMenuTask;
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
+    public static final String EXTRA_JSON = "EXTRA_JSON";
 
     TextView[][] tvInfo; // tvInfo[0][1] é a sobremesa do central
-    Bandex[] restaurantes;
+    public static Bandex[] restaurantes;
     JSONArray jsonArrayRestaurantes;
-    String jsonMenuRepresentation;
+    static String jsonMenuRepresentation;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -76,6 +77,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (changeActivity) {
             intent = new Intent(getApplicationContext(), clazz);
             intent.putExtra(EXTRA_RESTAURANTE, extra);
+            intent.putExtra(EXTRA_JSON, jsonMenuRepresentation);
             startActivity(intent);
         }
     }
@@ -137,7 +139,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public boolean jsonMenuToModel() {
+    public static boolean jsonMenuToModel() {
         try {
             JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
             List<Day> days;
@@ -194,7 +196,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         else period = 0;
 
         for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
-            meal = restaurantes[i].getDays().get(day_of_week-3).getDay()[period];
+            meal = restaurantes[i].getDays().get(4).getDay()[period];
             if (meal != null) {
                 tvInfo[i][0].setText(meal.getMeat());
                 tvInfo[i][1].setText(meal.getDesert());
