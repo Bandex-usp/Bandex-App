@@ -42,7 +42,8 @@
     </string-array>
 
 
-
+    <color name="home_background_color">#EDEDED</color>
+    <color name="white">#ffffff</color>
 
 
 
