@@ -26,7 +26,8 @@
 
 
     <string name="preferences_menu_cache">menu_cache</string>
-    <string name="title_foo">foo foo</string>
+    <string name="preferences_entry_date_cache">entry_date</string>
+    <string name="title_foo">foo</string>
     <string name="title_activity_more_details">Mais detalhes</string>
 
     <string name="title_activity_evaluate_line">Avaliação da Fila</string>

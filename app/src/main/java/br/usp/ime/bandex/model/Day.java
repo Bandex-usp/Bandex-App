@@ -1,5 +1,7 @@
 package br.usp.ime.bandex.model;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.format.DateFormat;
 import android.text.style.TtsSpan;
 import android.util.Log;
@@ -9,11 +11,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import br.usp.ime.bandex.MainActivity;
+import br.usp.ime.bandex.R;
+import br.usp.ime.bandex.Util;
+
 /**
  * Created by Wagner on 08/05/2015.
  */
 public class Day {
-    String entry_date;
+    Date entry_date;
     int dayOfWeek;
     Cardapio lunch;
     Cardapio dinner;
@@ -23,24 +29,23 @@ public class Day {
         return day;
     }
 
-    public Day(String entry_date, Cardapio lunch, Cardapio dinner) {
-        Date date;
+    public Day(String data, Cardapio lunch, Cardapio dinner, MainActivity caller) {
         day = new Cardapio[2];
         day[0] = lunch;
         day[1] = dinner;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd").parse(entry_date);
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+            entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(data);
         } catch (ParseException e) {
             Log.e("parseData", "erro ao parsear");
             e.printStackTrace();
         }
-
-        this.entry_date = entry_date;
         this.lunch = lunch;
         this.dinner = dinner;
+        Util.setEntry_date(entry_date);
+        SharedPreferences sharedPref = caller.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(caller.getString(R.string.preferences_entry_date_cache), data);
+        editor.commit();
     }
 
     public Cardapio getLunch() {
@@ -59,11 +64,11 @@ public class Day {
         this.dinner = dinner;
     }
 
-    public String getEntry_date() {
-        return entry_date;
+    public Date getEntry_date() {
+        return (Date)entry_date.clone();
     }
 
-    public void setEntry_date(String entry_date) {
-        this.entry_date = entry_date;
+    public void setEntry_date(Date entry_date) {
+        this.entry_date = (Date)entry_date.clone();
     }
 }

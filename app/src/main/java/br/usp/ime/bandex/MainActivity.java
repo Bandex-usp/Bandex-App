@@ -1,8 +1,14 @@
 package br.usp.ime.bandex;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,8 +28,11 @@ import android.net.NetworkInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import br.usp.ime.bandex.http.JSONGetter;
@@ -31,7 +40,6 @@ import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
 import br.usp.ime.bandex.tasks.GetMenuTask;
-
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -90,6 +98,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         tvInfo = new TextView[3][2];
 
         tvInfo[0][0] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
@@ -100,7 +109,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         tvInfo[2][1] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
         setOnClickListeners();
         if (!getMenuFromCache()) {
-            System.out.println("getting menu from internet");
+            System.out.println("Getting menu from internet");
             getMenuFromInternet();
         }
         else if (jsonMenuToModel())
@@ -108,7 +117,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     public void setJson(String preferences_key, String value) {
-        //Log.e("asdad", "adasda" + ((Boolean)(value == null)).toString());
         System.out.println("not ok. preferences_key: " + preferences_key);
         if (getString(R.string.preferences_menu_cache).equals(preferences_key)) {
             jsonMenuRepresentation = value;
@@ -122,7 +130,32 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     // Returns true if could get menu from cache successfully, false otherwise
     public boolean getMenuFromCache() {
         sharedPreferences = getPreferences(MODE_PRIVATE);
-        jsonMenuRepresentation = sharedPreferences.getString(getString(R.string.preferences_menu_cache), null);
+        String string_entry_date = sharedPreferences.getString(getString(R.string.preferences_entry_date_cache), null);
+        Date entry_date;
+        if (string_entry_date != null) { // já pegou da internet
+            try {
+                entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(string_entry_date);
+                Calendar cal = Calendar.getInstance();
+                Date atual = cal.getTime();
+                cal.setTime(entry_date);
+                int weekday = cal.get(Calendar.DAY_OF_WEEK);
+                if (weekday != Calendar.SUNDAY)
+                {
+                    int days = (Calendar.SATURDAY - weekday + 1) % 7;
+                    cal.add(Calendar.DAY_OF_YEAR, days);
+                }
+                // now is the date you want
+                entry_date = cal.getTime();
+                if (entry_date.before(atual)) {
+                    jsonMenuRepresentation = null;
+                }
+                else {
+                    jsonMenuRepresentation = sharedPreferences.getString(getString(R.string.preferences_menu_cache), null);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
         return jsonMenuRepresentation != null;
     }
 
@@ -131,15 +164,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
             new GetMenuTask(this, getString(R.string.preferences_menu_cache)).execute();
         } else {
-            Toast.makeText(getApplicationContext(), "Sem internet!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
         }
     }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public static boolean jsonMenuToModel() {
+    public boolean jsonMenuToModel() {
         try {
             JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
             List<Day> days;
@@ -168,7 +201,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert);
                         }
                     }
-                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1]);
+                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], this);
                     days.add(day);
                 } // Array de dias do json
                 restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
@@ -184,19 +217,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void showJsonContentOnScreen() {
         String mistura, sobremesa;
         Cardapio meal;
-        Calendar cal = Calendar.getInstance();
-        int hours = cal.get(Calendar.HOUR);
-        int minutes = cal.get(Calendar.MINUTE);
-        int period = 0; // 0 = lunch, 1 = dinner
-        int day_of_week = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7; // Calendar.Monday == 2. In this code, Monday = 0.
-
-        // Choose whether to show the lunch or the dinner
-        if (hours >= 14 && minutes >= 30)
-            period = 1;
-        else period = 0;
 
         for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
-            meal = restaurantes[i].getDays().get(4).getDay()[period];
+            meal = restaurantes[i].getDays().get(Util.day_of_week).getDay()[Util.period];
             if (meal != null) {
                 tvInfo[i][0].setText(meal.getMeat());
                 tvInfo[i][1].setText(meal.getDesert());
@@ -244,4 +267,3 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
 }
-

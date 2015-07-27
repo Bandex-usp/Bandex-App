@@ -1,5 +1,6 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
                     (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5 estrelas!", Toast.LENGTH_SHORT)).show();
                 } else {
                     if (chosenRestaurant == 1) {
-                        (Toast.makeText(getApplicationContext(), "Central avaliado com sucesso! " + evaluation, Toast.LENGTH_SHORT)).show();
+                        (Toast.makeText(getApplicationContext(), "Central avaliado com sucesso! ", Toast.LENGTH_SHORT)).show();
                     }
                     else if (chosenRestaurant == 2) {
                         (Toast.makeText(getApplicationContext(), "Química avaliada com sucesso!", Toast.LENGTH_SHORT)).show();

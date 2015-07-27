@@ -1,126 +1,153 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="br.usp.ime.bandex.MoreDetailsActivity">
-
-    <Spinner
-        android:id="@+id/days_spinner"
-        android:layout_width="fill_parent"
+    tools:context="br.usp.ime.bandex.MoreDetailsActivity"
+    android:fillViewport="true"
+    android:layout_gravity="center"
+    android:background="@color/azul_claro_usp">
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/days_array"
-        android:layout_below="@+id/activity_more_details_tv_line_evaluation_category"
-        android:layout_alignLeft="@+id/activity_more_details_tv_line_evaluation_category"
-        android:layout_alignStart="@+id/activity_more_details_tv_line_evaluation_category" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/title_bandex"
-        android:id="@+id/activity_more_details_tv_title_bandex"
-        android:layout_centerHorizontal="true" />
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_gravity="center"
+        android:background="@drawable/rectangle" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Principal"
-        android:id="@+id/activity_more_details_tv_main"
-        android:layout_marginTop="41dp"
-        android:layout_below="@+id/activity_more_details_tv_title_bandex"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/title_bandex"
+            android:id="@+id/activity_more_details_tv_title_bandex"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Carne"
-        android:id="@+id/activity_more_details_tv_meat"
-        android:layout_below="@+id/activity_more_details_tv_main"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Principal"
+            android:id="@+id/activity_more_details_tv_main"
+            android:layout_marginTop="41dp"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Acompanhamento"
-        android:id="@+id/activity_more_details_tv_second"
-        android:layout_below="@+id/activity_more_details_tv_meat"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Carne"
+            android:id="@+id/activity_more_details_tv_meat"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Salada"
-        android:id="@+id/activity_more_details_tv_salad"
-        android:layout_below="@+id/activity_more_details_tv_second"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Acompanhamento"
+            android:id="@+id/activity_more_details_tv_second"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Opcional"
-        android:id="@+id/activity_more_details_tv_optional"
-        android:layout_below="@+id/activity_more_details_tv_salad"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Salada"
+            android:id="@+id/activity_more_details_tv_salad"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Sobremesa"
-        android:id="@+id/activity_more_details_tv_desert"
-        android:layout_below="@+id/activity_more_details_tv_optional"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Opcional"
+            android:id="@+id/activity_more_details_tv_optional"
+            android:layout_gravity="center" />
 
-    <RatingBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/ratingBar2"
-        android:layout_below="@+id/activity_more_details_tv_line_status"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Sobremesa"
+            android:id="@+id/activity_more_details_tv_desert"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Status da Fila"
-        android:id="@+id/activity_more_details_tv_line_status"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Status da Fila"
+            android:id="@+id/activity_more_details_tv_line_status"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Última atualização: "
-        android:id="@+id/textView11"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/ratingBar2"
-        android:layout_alignStart="@+id/ratingBar2" />
+        <RatingBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ratingBar2"
+            android:layout_gravity="center"
+            android:rating="4"
+            android:isIndicator="true"  />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Data e hora"
-        android:id="@+id/textView12"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/ratingBar2"
-        android:layout_alignEnd="@+id/ratingBar2" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Fila Ótima"
+            android:id="@+id/activity_more_details_tv_line_evaluation_category"
+            android:layout_gravity="center" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Fila Ótima"
-        android:id="@+id/activity_more_details_tv_line_evaluation_category"
-        android:layout_below="@+id/ratingBar2"
-        android:layout_alignLeft="@+id/activity_more_details_tv_desert"
-        android:layout_alignStart="@+id/activity_more_details_tv_desert" />
 
-</RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="15dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Outro dia: "
+                android:layout_weight="1"/>
+
+            <Spinner
+                android:id="@+id/days_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:entries="@array/days_array"
+                android:layout_weight="1"/>
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_margin="40dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Última atualização: "
+                android:id="@+id/textView11"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="27/07/2015 12:26"
+                android:id="@+id/textView12"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+
+

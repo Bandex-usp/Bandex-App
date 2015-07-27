@@ -1,5 +1,6 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.internal.widget.AdapterViewCompat;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import br.usp.ime.bandex.model.Bandex;
 
@@ -46,20 +48,21 @@ public class MoreDetailsActivity extends ActionBarActivity {
         else if ("Física".equals(restaurantName)) {
             chosenRestaurant = 2;
         }
-        showMenuByRestaurant(chosenRestaurant, 3, 0);
+        showMenuByRestaurant(chosenRestaurant, Util.day_of_week, Util.period);
         TextView tv_bandex = (TextView) findViewById(R.id.activity_more_details_tv_title_bandex);
         tv_bandex.setText(restaurantName);
-        Spinner spinner1 = (Spinner) findViewById(R.id.days_spinner);
+        Spinner spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
+        spinner1.setSelection(Util.day_of_week);
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 daySelected = position;
-                showMenuByRestaurant(chosenRestaurant, daySelected, 0);
+                showMenuByRestaurant(chosenRestaurant, daySelected, Util.period);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                showMenuByRestaurant(chosenRestaurant, Util.day_of_week, Util.period);
             }
         });
     }
@@ -67,6 +70,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
     public void showMenuByRestaurant(int restaurant_id, int day_of_week, int period) {
         Bandex restaurant = MainActivity.restaurantes[restaurant_id];
         if (restaurant.getDays().get(day_of_week).getDay()[period] == null) {
+            Toast.makeText(getApplicationContext(), "Restaurante Fechado!", Toast.LENGTH_SHORT).show();
             return;
         }
         TextView tv_main = (TextView) findViewById(R.id.activity_more_details_tv_main);
