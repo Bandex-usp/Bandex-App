@@ -1,13 +1,16 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.internal.widget.AdapterViewCompat;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,12 +24,39 @@ public class MoreDetailsActivity extends ActionBarActivity {
     int chosenRestaurant;
     int daySelected = 0;
 
+    public void setCustomActionBar() {
+        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
+        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Raleway-Bold.ttf");
+        tvActionBar.setText("Mais Detalhes");
+        tvActionBar.setTypeface(face);
+
+        ImageButton imageButton = (ImageButton) mCustomView
+                .findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Refresh Clicked!",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_details);
         chosenRestaurant = 0;
-
+        setCustomActionBar();
         String restaurantName;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();

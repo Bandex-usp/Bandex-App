@@ -11,7 +11,7 @@
     tools:context="br.usp.ime.bandex.MoreDetailsActivity"
     android:fillViewport="true"
     android:layout_gravity="center"
-    android:background="@color/azul_claro_usp">
+    android:background="@color/fundo_site_usp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

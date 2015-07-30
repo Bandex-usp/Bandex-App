@@ -16,11 +16,22 @@
 
     <!-- ActionBar styles -->
     <style name="MyActionBar"
-        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="logo">@drawable/abc</item>
+        <item name="displayOptions">useLogo|showTitle</item>
         <item name="android:background">@drawable/actionbar_background</item>
-        <item name="android:icon">@drawable/logo_usp_ico</item>
 
         <!-- Support library compatibility -->
         <item name="background">@drawable/actionbar_background</item>
     </style>
+
+
+        <style name="Widget.ActionBar" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+            <!-- ... -->
+        </style>
+
+        <style name="Widget.ActionBar.Logo">
+            <item name="android:logo">@drawable/usp_logo</item>
+            <item name="android:displayOptions">useLogo|showHome</item>
+        </style>
 </resources>

@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity"
-    android:background="@color/azul_claro_usp"
+    android:background="@color/fundo_site_usp"
     android:fillViewport="true">
 
     <!-- ll_main -->
@@ -22,7 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:weightSum="10"
-        android:background="@color/azul_claro_usp">
+        android:background="@color/fundo_site_usp"
+        android:id="@+id/activity_main_ll">
 
         <LinearLayout
             android:layout_weight="3"

@@ -7,11 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.internal.view.SupportActionModeWrapper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +28,8 @@ import android.os.AsyncTask;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,26 +99,66 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         this.jsonArrayRestaurantes = jsonArrayRestaurantes;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public void setCustomActionBar() {
+        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
 
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
+        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Raleway-Bold.ttf");
+        tvActionBar.setText(getString(R.string.app_name));
+        tvActionBar.setTypeface(face);
+
+        ImageButton imageButton = (ImageButton) mCustomView
+                .findViewById(R.id.imageButton);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Refresh Clicked!",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
+    }
+
+    public void setTextViews() {
         tvInfo = new TextView[3][2];
-
         tvInfo[0][0] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
         tvInfo[0][1] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
         tvInfo[1][0] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
         tvInfo[1][1] = (TextView) findViewById(R.id.activity_main_quimica_tv_sobremesa);
         tvInfo[2][0] = (TextView) findViewById(R.id.activity_main_fisica_tv_mistura);
         tvInfo[2][1] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
-        setOnClickListeners();
+    }
+
+
+    public void setMenu() {
         if (!getMenuFromCache()) {
-            System.out.println("Getting menu from internet");
+            Log.d("setMenu", "Getting menu from internet");
             getMenuFromInternet();
         }
         else if (jsonMenuToModel())
-                showJsonContentOnScreen();
+            showJsonContentOnScreen();
+    }
+
+    public void setLineStatus() {
+        //todo: Fazer o get do serviço de filas
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setCustomActionBar();
+        setTextViews();
+        setOnClickListeners();
+        setMenu();
+        setLineStatus();
     }
 
     public void setJson(String preferences_key, String value) {
@@ -134,6 +179,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Date entry_date;
         if (string_entry_date != null) { // já pegou da internet
             try {
+                // Verifica se está desatualizado
                 entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(string_entry_date);
                 Calendar cal = Calendar.getInstance();
                 Date atual = cal.getTime();
@@ -144,14 +190,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     int days = (Calendar.SATURDAY - weekday + 1) % 7;
                     cal.add(Calendar.DAY_OF_YEAR, days);
                 }
-                // now is the date you want
                 entry_date = cal.getTime();
-                if (entry_date.before(atual)) {
-                    jsonMenuRepresentation = null;
-                }
-                else {
+                //if (entry_date.before(atual)) {
+                  //  jsonMenuRepresentation = null;
+                    // fim Verifica se está desatualizado
+                //}
+                //else {
                     jsonMenuRepresentation = sharedPreferences.getString(getString(R.string.preferences_menu_cache), null);
-                }
+                //}
             } catch (ParseException e) {
                 e.printStackTrace();
             }
