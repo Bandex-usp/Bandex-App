@@ -23,40 +23,14 @@ public class MoreDetailsActivity extends ActionBarActivity {
     String jsonRepresentation;
     int chosenRestaurant;
     int daySelected = 0;
-
-    public void setCustomActionBar() {
-        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
-        LayoutInflater mInflater = LayoutInflater.from(this);
-
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
-        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Raleway-Bold.ttf");
-        tvActionBar.setText("Mais Detalhes");
-        tvActionBar.setTypeface(face);
-
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Refresh Clicked!",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
-    }
+    Spinner spinner1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_details);
         chosenRestaurant = 0;
-        setCustomActionBar();
+        Util.setCustomActionBar(this);
         String restaurantName;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -81,7 +55,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         showMenuByRestaurant(chosenRestaurant, Util.day_of_week, Util.period);
         TextView tv_bandex = (TextView) findViewById(R.id.activity_more_details_tv_title_bandex);
         tv_bandex.setText(restaurantName);
-        Spinner spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
+        spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
         spinner1.setSelection(Util.day_of_week);
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -101,6 +75,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         Bandex restaurant = MainActivity.restaurantes[restaurant_id];
         if (restaurant.getDays().get(day_of_week).getDay()[period] == null) {
             Toast.makeText(getApplicationContext(), "Restaurante Fechado!", Toast.LENGTH_SHORT).show();
+            spinner1.setSelection(Util.day_of_week);
             return;
         }
         TextView tv_main = (TextView) findViewById(R.id.activity_more_details_tv_main);

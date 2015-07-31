@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:background="@drawable/actionbar_background"
+    android:background="@drawable/actionbar_background2"
     android:layout_gravity="fill_horizontal">
 
     <TextView
@@ -14,16 +14,18 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#fff"
         android:textStyle="bold"
-        android:text="Bandejão Melhor"/>
+        android:text="Bandejão Melhor"
+        android:layout_marginLeft="8dp"/>
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="3dp"
-        android:src="@drawable/usp_logo" />
+        android:src="@drawable/logo_usp2"
+        android:layout_alignLeft="@id/title_text_action_bar"/>
 
     <ImageButton
         android:id="@+id/imageButton"

@@ -22,38 +22,11 @@ public class EvaluateLineActivity extends ActionBarActivity {
     public int chosenRestaurant = 0; //1 = Central, 2 = Química, 3 = Física, 0 = nenhum
     public int evaluation = 0; // Valores possíveis: 1 a 5
 
-    public void setCustomActionBar() {
-        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
-        LayoutInflater mInflater = LayoutInflater.from(this);
-
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
-        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Raleway-Bold.ttf");
-        tvActionBar.setText("Avaliação da Fila");
-        tvActionBar.setTypeface(face);
-
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Refresh Clicked!",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate_line);
-        setCustomActionBar();
+        Util.setCustomActionBar(this);
         BootstrapButton btn_send = (BootstrapButton) findViewById(R.id.activity_evaluate_line_btn_send);
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -8,6 +8,7 @@
     <application
         android:allowBackup="true"
         android:logo="@mipmap/usp_logo"
+        android:icon="@drawable/diningicon"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light">
         <activity

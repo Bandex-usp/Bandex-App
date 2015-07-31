@@ -99,33 +99,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         this.jsonArrayRestaurantes = jsonArrayRestaurantes;
     }
 
-    public void setCustomActionBar() {
-        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
-        LayoutInflater mInflater = LayoutInflater.from(this);
-
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
-        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/Raleway-Bold.ttf");
-        tvActionBar.setText(getString(R.string.app_name));
-        tvActionBar.setTypeface(face);
-
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Refresh Clicked!",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.actionbar_background));
-    }
-
     public void setTextViews() {
         tvInfo = new TextView[3][2];
         tvInfo[0][0] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
@@ -154,7 +127,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setCustomActionBar();
+        Util.setCustomActionBar(this);
         setTextViews();
         setOnClickListeners();
         setMenu();
