@@ -47,10 +47,11 @@ import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
 import br.usp.ime.bandex.tasks.GetMenuTask;
 
+import br.usp.ime.bandex.Util.Bandejao;
+
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
-    public static final String EXTRA_JSON = "EXTRA_JSON";
     static TextView[][] tvInfo = new TextView[3][2]; // tvInfo[0][1] é a sobremesa do central
 
     @Override
@@ -60,21 +61,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         final int fisica_details = R.id.activity_main_fisica_btn_more_details;
         final int evaluate_line = R.id.activity_main_btn_evaluate_line;
         Class clazz = MoreDetailsActivity.class;
-        String extra = "";
+        Bandejao extra = Bandejao.CENTRAL;
         Intent intent;
         Boolean changeActivity = true;
 
         switch (v.getId()) {
             case central_details:
-                extra = "Central";
+                extra = Bandejao.CENTRAL;
                 break;
             case quimica_details:
-                extra = "Química";
-                //intent.putExtra(EXTRA_RESTAURANTE, "Química");
+                extra = Bandejao.QUIMICA;
                 break;
             case fisica_details:
-                extra = "Física";
-                //intent.putExtra(EXTRA_RESTAURANTE, "Química");
+                extra = Bandejao.FISICA;
                 break;
             case evaluate_line:
                 clazz = EvaluateLineActivity.class;
@@ -101,7 +100,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     public void showModelContentOnScreen() {
-        String mistura, sobremesa;
         Cardapio meal;
 
         for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
@@ -110,8 +108,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 tvInfo[i][0].setText(meal.getMeat());
                 tvInfo[i][1].setText(meal.getDesert());
             } else {
-                tvInfo[i][0].setText("Restaurante Fechado");
-                tvInfo[i][1].setText("Restaurante Fechado");
+                tvInfo[i][0].setText("Restaurante Fechado.");
+                tvInfo[i][1].setText("Restaurante Fechado.");
             }
         }
     }

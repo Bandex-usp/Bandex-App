@@ -48,6 +48,20 @@ public class Util {
     private static SharedPreferences sharedPreferences;
     static String jsonMenuRepresentation;
     public static Bandex[] restaurantes;
+    public static String restaurantNames[] = {"Central", "Química", "Física"};
+
+    public static enum Bandejao  {
+        CENTRAL(0),
+        QUIMICA(1),
+        FISICA(2);
+        private int valor = 0;
+        Bandejao(int valorOpcao) {
+            valor = valorOpcao;
+        }
+        public static int getValor(Bandejao bandex) {
+            return bandex.valor;
+        }
+    }
 
     public static void setMainActivityInstance(MainActivity instance) {
         mainActivityInstance = instance;

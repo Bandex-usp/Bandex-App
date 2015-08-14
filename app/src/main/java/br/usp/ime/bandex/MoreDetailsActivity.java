@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.usp.ime.bandex.model.Bandex;
+import br.usp.ime.bandex.Util.Bandejao;
 
 
 public class MoreDetailsActivity extends ActionBarActivity {
@@ -28,37 +29,30 @@ public class MoreDetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_details);
-        currentPeriodOnScreen = Util.getPeriod();
-        int daySelected = 0;
-        //tv_fechado = (TextView) findViewById(R.id.tv_fechado);
-        ll_info_cardapio = (LinearLayout) findViewById(R.id.info_cardapio);
-        currentRestaurantOnScreen = 0;
         Util.setCustomActionBar(this);
-        String restaurantName;
+        currentPeriodOnScreen = Util.getPeriod();
+        currentDayOfWeekOnScreen = Util.getDay_of_week();
+        ll_info_cardapio = (LinearLayout) findViewById(R.id.info_cardapio);
+
+        int restaurantId;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
-                restaurantName = "";
+                currentRestaurantOnScreen = Bandejao.getValor(Bandejao.CENTRAL);
             } else {
-                restaurantName = extras.getString(MainActivity.EXTRA_RESTAURANTE);
+                currentRestaurantOnScreen = Bandejao.getValor((Bandejao) extras.get((MainActivity.EXTRA_RESTAURANTE)));
             }
         } else {
-            restaurantName = (String) savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
+            currentRestaurantOnScreen = Bandejao.getValor((Bandejao) savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE));
         }
 
-        if ("Química".equals(restaurantName)) {
-            currentRestaurantOnScreen = 1;
-        }
-        else if ("Física".equals(restaurantName)) {
-            currentRestaurantOnScreen = 2;
-        }
         RadioButton rbSelected = Util.getPeriod() == 0 ?
                 (RadioButton) findViewById(R.id.activity_more_details_rb_almoco) :
                 (RadioButton) findViewById(R.id.activity_more_details_rb_jantar);
         rbSelected.setChecked(true);
         showMenuAndLineByRestaurant(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriod());
         TextView tv_bandex = (TextView) findViewById(R.id.activity_more_details_tv_title_bandex);
-        tv_bandex.setText(restaurantName);
+        tv_bandex.setText(Util.restaurantNames[currentRestaurantOnScreen]);
         spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
         spinner1.setSelection(Util.getDay_of_week());
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
