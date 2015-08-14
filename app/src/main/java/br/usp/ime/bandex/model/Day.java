@@ -2,7 +2,7 @@ package br.usp.ime.bandex.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.format.DateFormat;
+import java.text.DateFormat;
 import android.text.style.TtsSpan;
 import android.util.Log;
 
@@ -20,6 +20,7 @@ import br.usp.ime.bandex.Util;
  */
 public class Day {
     Date entry_date;
+    String entry_dateS; // string representation
     int dayOfWeek;
     Cardapio lunch;
     Cardapio dinner;
@@ -42,6 +43,8 @@ public class Day {
         this.lunch = lunch;
         this.dinner = dinner;
         Util.setEntry_date(entry_date);
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        entry_dateS = df.format(entry_date);
         SharedPreferences sharedPref = caller.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(caller.getString(R.string.preferences_entry_date_cache), data);
@@ -66,6 +69,10 @@ public class Day {
 
     public Date getEntry_date() {
         return (Date)entry_date.clone();
+    }
+
+    public String getEntry_DateS() {
+        return entry_dateS;
     }
 
     public void setEntry_date(Date entry_date) {

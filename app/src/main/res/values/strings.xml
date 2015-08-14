@@ -17,12 +17,14 @@
 
     <string name="title_evaluate_line">Avaliar Fila</string>
     <string name="title_more_details">Mais detalhes</string>
-    <string name="title_great_line">Fila Ótima</string>
-    <string name="title_good_line">Fila Boa</string>
+    <string name="title_great_line">Fila Muito Pequena</string>
+    <string name="title_good_line">Fila Pequena</string>
     <string name="title_regular_line">Fila Média</string>
-    <string name="title_bad_line">Fila Ruim</string>
-    <string name="title_horrible_line">Fila Péssima</string>
+    <string name="title_bad_line">Fila Grande</string>
+    <string name="title_horrible_line">Fila Enorme</string>
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
+
+    <string name="closedRestaurant">Restaurante Fechado.</string>
 
 
     <string name="preferences_menu_cache">menu_cache</string>

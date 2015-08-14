@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -50,12 +51,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
     public static final String EXTRA_JSON = "EXTRA_JSON";
-
-    TextView[][] tvInfo; // tvInfo[0][1] é a sobremesa do central
-    public static Bandex[] restaurantes;
-    JSONArray jsonArrayRestaurantes;
-    static String jsonMenuRepresentation;
-    private SharedPreferences sharedPreferences;
+    static TextView[][] tvInfo = new TextView[3][2]; // tvInfo[0][1] é a sobremesa do central
 
     @Override
     public void onClick(View v) {
@@ -90,17 +86,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (changeActivity) {
             intent = new Intent(getApplicationContext(), clazz);
             intent.putExtra(EXTRA_RESTAURANTE, extra);
-            intent.putExtra(EXTRA_JSON, jsonMenuRepresentation);
             startActivity(intent);
         }
     }
 
-    public void setJsonArrayRestaurantes(JSONArray jsonArrayRestaurantes) {
-        this.jsonArrayRestaurantes = jsonArrayRestaurantes;
-    }
 
     public void setTextViews() {
-        tvInfo = new TextView[3][2];
         tvInfo[0][0] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
         tvInfo[0][1] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
         tvInfo[1][0] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
@@ -109,14 +100,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         tvInfo[2][1] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
     }
 
+    public void showModelContentOnScreen() {
+        String mistura, sobremesa;
+        Cardapio meal;
 
-    public void setMenu() {
-        if (!getMenuFromCache()) {
-            Log.d("setMenu", "Getting menu from internet");
-            getMenuFromInternet();
+        for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
+            meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriod()];
+            if (meal != null) {
+                tvInfo[i][0].setText(meal.getMeat());
+                tvInfo[i][1].setText(meal.getDesert());
+            } else {
+                tvInfo[i][0].setText("Restaurante Fechado");
+                tvInfo[i][1].setText("Restaurante Fechado");
+            }
         }
-        else if (jsonMenuToModel())
-            showJsonContentOnScreen();
     }
 
     public void setLineStatus() {
@@ -127,126 +124,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Util.setCustomActionBar(this);
         setTextViews();
         setOnClickListeners();
-        setMenu();
+        Util.setMainActivityInstance(this);
+        Util.setMenuStrings();
+        if (Util.jsonMenuToModel()) {
+            showModelContentOnScreen();
+        }
+        Util.setCustomActionBar(this);
         setLineStatus();
-    }
-
-    public void setJson(String preferences_key, String value) {
-        System.out.println("not ok. preferences_key: " + preferences_key);
-        if (getString(R.string.preferences_menu_cache).equals(preferences_key)) {
-            jsonMenuRepresentation = value;
-            Log.d("Debug setJSon", "ok");
-        } else {
-
-        }
-        // todo else: preferences_evaluation_cache
-    }
-
-    // Returns true if could get menu from cache successfully, false otherwise
-    public boolean getMenuFromCache() {
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        String string_entry_date = sharedPreferences.getString(getString(R.string.preferences_entry_date_cache), null);
-        Date entry_date;
-        if (string_entry_date != null) { // já pegou da internet
-            try {
-                // Verifica se está desatualizado
-                entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(string_entry_date);
-                Calendar cal = Calendar.getInstance();
-                Date atual = cal.getTime();
-                cal.setTime(entry_date);
-                int weekday = cal.get(Calendar.DAY_OF_WEEK);
-                if (weekday != Calendar.SUNDAY)
-                {
-                    int days = (Calendar.SATURDAY - weekday + 1) % 7;
-                    cal.add(Calendar.DAY_OF_YEAR, days);
-                }
-                entry_date = cal.getTime();
-                //if (entry_date.before(atual)) {
-                  //  jsonMenuRepresentation = null;
-                    // fim Verifica se está desatualizado
-                //}
-                //else {
-                    jsonMenuRepresentation = sharedPreferences.getString(getString(R.string.preferences_menu_cache), null);
-                //}
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonMenuRepresentation != null;
-    }
-
-    public void getMenuFromInternet() {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            //Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
-            new GetMenuTask(this, getString(R.string.preferences_menu_cache)).execute();
-        } else {
-            Toast.makeText(getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Returns true if could pass json to model correctly and false otherwise
-    public boolean jsonMenuToModel() {
-        try {
-            JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
-            List<Day> days;
-            JSONObject jsonBandex;
-            JSONArray jsonArrayBandexDays;
-            String[] strings_lunch_dinner = {"lunch", "dinner"};
-            String main, meat, second, salad, optional, desert;
-            restaurantes = new Bandex[3];
-            for (int j = 0; j < 3; j++) { // Percorre array de restaurantes do json
-                jsonBandex = jsonMenu.getJSONObject(j);
-                jsonArrayBandexDays = jsonBandex.getJSONArray("days");
-                days = new ArrayList<Day>();
-                for (int i = 0; i < jsonArrayBandexDays.length(); i++) { // percorre o array de dias do json
-                    JSONObject jsonDay = jsonArrayBandexDays.getJSONObject(i);
-                    Cardapio[] cardapios_lunch_dinner = {null, null};
-                    String data = jsonDay.getString("entry_date");
-                    for (int k = 0; k < 2; k++) { // Percorre lunch e dinner
-                        JSONObject jsonMeal = jsonDay.optJSONObject(strings_lunch_dinner[k]);
-                        if (jsonMeal != null) {
-                            main = jsonMeal.getString("main");
-                            meat = jsonMeal.getString("meat");
-                            second = jsonMeal.getString("second");
-                            salad = jsonMeal.getString("salad");
-                            optional = jsonMeal.getString("optional");
-                            desert = jsonMeal.getString("desert");
-                            cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert);
-                        }
-                    }
-                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], this);
-                    days.add(day);
-                } // Array de dias do json
-                restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
-            } // array de restaurantes do json
-        } catch (JSONException e) {
-            Log.e("JsonParser", "Falha ao ler os atributos do json.");
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public void showJsonContentOnScreen() {
-        String mistura, sobremesa;
-        Cardapio meal;
-
-        for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
-            meal = restaurantes[i].getDays().get(Util.day_of_week).getDay()[Util.period];
-            if (meal != null) {
-                tvInfo[i][0].setText(meal.getMeat());
-                tvInfo[i][1].setText(meal.getDesert());
-            } else {
-                tvInfo[i][0].setText("Restaurante Fechado");
-                tvInfo[i][1].setText("Restaurante Fechado");
-            }
-        }
     }
 
     public void setOnClickListeners() {

@@ -13,7 +13,8 @@
         android:theme="@style/Theme.AppCompat.Light">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +24,8 @@
         <activity
             android:name=".MoreDetailsActivity"
             android:label="@string/title_activity_more_details"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.usp.ime.bandex.MainActivity" />
@@ -31,7 +33,8 @@
         <activity
             android:name=".EvaluateLineActivity"
             android:label="@string/title_activity_evaluate_line"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.usp.ime.bandex.MainActivity" />
