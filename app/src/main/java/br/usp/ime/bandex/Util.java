@@ -33,7 +33,8 @@ import br.usp.ime.bandex.http.JSONGetter;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
-import br.usp.ime.bandex.tasks.GetMenuTask;
+import br.usp.ime.bandex.tasks.LineJsonTask;
+import br.usp.ime.bandex.tasks.MenuJsonTask;
 
 /**
  * Created by Wagner on 26/07/2015.
@@ -65,8 +66,8 @@ public class Util {
     static final int DINNER_END_MINUTE = 45;
     public static MainActivity mainActivityInstance;
     private static SharedPreferences sharedPreferences;
-    static String jsonMenuRepresentation;
-    static String jsonLineRepresentation;
+    public static String jsonMenuRepresentation;
+    public static String jsonLineRepresentation;
     public static Bandex[] restaurantes;
     public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
@@ -111,7 +112,7 @@ public class Util {
                 mainActivityInstance.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new GetMenuTask().execute(mainActivityInstance.getString(R.string.preferences_line_cache),
+            new LineJsonTask().execute(mainActivityInstance.getString(R.string.preferences_line_cache),
                     mainActivityInstance.getString(R.string.line_service_url));
         } else {
             Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
@@ -128,14 +129,16 @@ public class Util {
                 JSONObject jsonAval = jsonMenu.getJSONObject(j);
                 int status = jsonAval.getInt("status");
                 int restaurant_id = jsonAval.getInt("restaurant_id");
-                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(jsonAval.getString("restaurant_id"));
+                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(jsonAval.getString("submit_date"));
                 long peso = (submit_date.getTime() - horariosBandex[getPeriod()].getTime().getTime()); // milisegundos
                 pesos[restaurant_id] += peso;
                 currentLineStatus[restaurant_id] += peso * status;
             }
 
             for (int i = 0; i < 3; i++) {
-                currentLineStatus[i] = currentLineStatus[i] / pesos[i];
+                if (pesos[i] != 0) {
+                    currentLineStatus[i] = currentLineStatus[i] / pesos[i];
+                }
             }
 
         } catch (Exception e) {
@@ -170,6 +173,11 @@ public class Util {
                 }
                 else {
                     jsonMenuRepresentation = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_menu_cache), null);
+                    if (jsonMenuToModel(jsonMenuRepresentation)) {
+                        mainActivityInstance.showModelContentOnScreen();
+                    } else {
+                        Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -228,7 +236,7 @@ public class Util {
         if (networkInfo != null && networkInfo.isConnected()) {
             //Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
 
-            new GetMenuTask().execute(mainActivityInstance.getString(R.string.preferences_menu_cache),
+            new MenuJsonTask().execute(mainActivityInstance.getString(R.string.preferences_menu_cache),
                                       mainActivityInstance.getString(R.string.menu_service_url));
         } else {
             Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();

@@ -16,8 +16,8 @@ import br.usp.ime.bandex.http.JSONGetter;
 
 /**
  * Created by Wagner on 09/05/2015.
-*/                                         //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
-public class GetMenuTask extends AsyncTask<String, String, String[]> {
+*/                                 //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
+public abstract class JsonTask extends AsyncTask<String, String, String[]> {
     private ProgressDialog pDialog;
 
     @Override
@@ -47,5 +47,7 @@ public class GetMenuTask extends AsyncTask<String, String, String[]> {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(args[0], args[1]);
         editor.commit();
+        jsonToModelAndScreen();
     }
+    public abstract void jsonToModelAndScreen();
 }

@@ -45,7 +45,6 @@ import br.usp.ime.bandex.http.JSONGetter;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
-import br.usp.ime.bandex.tasks.GetMenuTask;
 
 import br.usp.ime.bandex.Util.Bandejao;
 
@@ -126,15 +125,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setOnClickListeners();
         Util.setMainActivityInstance(this);
         Util.setMenuStrings();
-        if (Util.jsonMenuToModel(Util.jsonMenuRepresentation)) {
-            showModelContentOnScreen();
-        } else {
-            Toast.makeText(this, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
-        }
         Util.setLineStrings();
-        if (Util.jsonLineToModel(Util.jsonLineRepresentation)) {
-
-        }
         Util.setCustomActionBar(this);
 
         setLineStatus();
