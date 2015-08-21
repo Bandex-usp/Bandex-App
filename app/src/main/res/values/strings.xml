@@ -23,10 +23,14 @@
     <string name="title_bad_line">Fila Grande</string>
     <string name="title_horrible_line">Fila Enorme</string>
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
+    <string name="line_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
+
+
 
     <string name="closedRestaurant">Restaurante Fechado.</string>
 
 
+    <string name="preferences_line_cache">line_cache</string>
     <string name="preferences_menu_cache">menu_cache</string>
     <string name="preferences_entry_date_cache">entry_date</string>
     <string name="title_foo">foo</string>

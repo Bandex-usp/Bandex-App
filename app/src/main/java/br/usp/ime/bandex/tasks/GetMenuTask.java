@@ -16,16 +16,9 @@ import br.usp.ime.bandex.http.JSONGetter;
 
 /**
  * Created by Wagner on 09/05/2015.
- */
-public class GetMenuTask extends AsyncTask<String, String, String> {
+*/                                         //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
+public class GetMenuTask extends AsyncTask<String, String, String[]> {
     private ProgressDialog pDialog;
-    String preferences_key;
-    String url;
-
-    public GetMenuTask(String preferences_key, String url) {
-        this.preferences_key = preferences_key;
-        this.url = url;
-    }
 
     @Override
     protected void onPreExecute() {
@@ -38,20 +31,21 @@ public class GetMenuTask extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected String doInBackground(String... args) {
+    protected String[] doInBackground(String... args) { //preferences_key, url
         // Getting JSON from URL
         JSONGetter jsonGetter = new JSONGetter();
-        String json = jsonGetter.getJSONFromUrl(this.url);
-        return json;
+        String json = jsonGetter.getJSONFromUrl(args[1]);
+        return new String[] {args[0], json}; // parametro do on post execute
     }
 
     @Override
-    protected void onPostExecute(String jsonStr) {
+    protected void onPostExecute(String []args) { //preferences_key, json
+        super.onPostExecute(args);
+        Util.setJson(args[0], args[1]);
         pDialog.dismiss();
         SharedPreferences sharedPref = Util.mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(preferences_key, jsonStr);
+        editor.putString(args[0], args[1]);
         editor.commit();
-        Util.setJson(preferences_key, jsonStr);
     }
 }

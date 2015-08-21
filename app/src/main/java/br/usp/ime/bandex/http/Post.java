@@ -1,47 +1,58 @@
 package br.usp.ime.bandex.http;
 
-/** Adaptado de RAJ AMAL
- * Autor: RAJ AMAL
- * Fonte: http://www.learn2crack.com/2013/10/android-asynctask-json-parsing-example.html
- */
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
 
-import android.util.Log;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 
-public class JSONGetter {
+import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * Created by Wagner on 21/08/2015.
+ */
+public class Post {
     static InputStream is = null;
     static String json = "";
 
     // constructor
-    public JSONGetter() {
+    public Post() {
 
     }
 
     /* Returns the JSONArray corresponding to the url
        Returns null if any error occurred, like internet connection down
     */
-    public String getJSONFromUrl(String url) {
+    public String postToURL(String data, String url) {
 
         // Making HTTP request
         try {
             // defaultHttpClient
             DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(url);
+            HttpPost httpPost = new HttpPost(url);
 
-            HttpResponse httpResponse = httpClient.execute(httpGet);
+            URL obj = new URL(url);
+            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+            //add request header
+            con.setRequestMethod("POST");
+            //con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+            String urlParameters = "sn=C02G8416DRJM&cn=&locale=&caller=&num=12345";
+
+
+
+            HttpResponse httpResponse = httpClient.execute(httpPost);
             HttpEntity httpEntity = httpResponse.getEntity();
             is = httpEntity.getContent();
 

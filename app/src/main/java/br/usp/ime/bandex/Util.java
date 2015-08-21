@@ -1,11 +1,14 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import br.usp.ime.bandex.http.JSONGetter;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
@@ -36,6 +41,20 @@ import br.usp.ime.bandex.tasks.GetMenuTask;
 public class Util {
 
     static Date entry_date = null;
+    static Calendar horariosBandex[] = new Calendar[4]; // lunch_start, dinner_start, lunch_end, dinner_end
+    static String horariosStr[] = {"11:30:00", "17:30:00", "14:15:00", "19:45:00"};
+    static {
+        try {
+            for (int i = 0; i < 4; i++) {
+                horariosBandex[i] = Calendar.getInstance();
+                horariosBandex[i].setTime(new SimpleDateFormat("HH:mm:ss").parse(horariosStr[i]));
+            }
+        } catch (ParseException p) {
+            p.printStackTrace();
+        }
+
+    }
+
     static final int LUNCH_START_HOUR = 11;
     static final int LUNCH_START_MINUTE = 30;
     static final int LUNCH_END_HOUR = 14;
@@ -47,7 +66,9 @@ public class Util {
     public static MainActivity mainActivityInstance;
     private static SharedPreferences sharedPreferences;
     static String jsonMenuRepresentation;
+    static String jsonLineRepresentation;
     public static Bandex[] restaurantes;
+    public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
 
     public static enum Bandejao  {
@@ -76,13 +97,52 @@ public class Util {
 
     public static void setJson(String preferences_key, String value) {
         System.out.println("not ok. preferences_key: " + preferences_key);
-        if (mainActivityInstance.getString(R.string.preferences_menu_cache).equals(preferences_key)) {
+        if (mainActivityInstance.getString(R.string.preferences_menu_cache).equals(preferences_key)) { // definindo menu json
             jsonMenuRepresentation = value;
-            Log.d("Debug setJSon", "ok");
-        } else {
-
+            Log.d("Debug setMenuJSon", "ok");
+        } else if (mainActivityInstance.getString(R.string.preferences_line_cache).equals(preferences_key)) { // definindo line json
+            jsonLineRepresentation = value;
+            Log.d("Debug setLineJSon", "ok");
         }
-        // todo else: preferences_evaluation_cache
+    }
+
+    public static void setLineStrings() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                mainActivityInstance.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new GetMenuTask().execute(mainActivityInstance.getString(R.string.preferences_line_cache),
+                    mainActivityInstance.getString(R.string.line_service_url));
+        } else {
+            Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static boolean jsonLineToModel(String jrsonStr) {
+        currentLineStatus = new float[3];
+        long pesos[] = new long[3];
+        try {
+            JSONArray jsonMenu = new JSONArray(jrsonStr);
+            int len = jsonMenu.length();
+            for (int j = 0; j < len; j++) { // Percorre array de avaliações do json
+                JSONObject jsonAval = jsonMenu.getJSONObject(j);
+                int status = jsonAval.getInt("status");
+                int restaurant_id = jsonAval.getInt("restaurant_id");
+                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(jsonAval.getString("restaurant_id"));
+                long peso = (submit_date.getTime() - horariosBandex[getPeriod()].getTime().getTime()); // milisegundos
+                pesos[restaurant_id] += peso;
+                currentLineStatus[restaurant_id] += peso * status;
+            }
+
+            for (int i = 0; i < 3; i++) {
+                currentLineStatus[i] = currentLineStatus[i] / pesos[i];
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     // Returns true if could get menu from cache successfully, false otherwise
@@ -119,9 +179,9 @@ public class Util {
     }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public static boolean jsonMenuToModel() {
+    public static boolean jsonMenuToModel(String jsonStr) {
         try {
-            JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
+            JSONArray jsonMenu = new JSONArray(jsonStr);
             List<Day> days;
             JSONObject jsonBandex;
             JSONArray jsonArrayBandexDays;
@@ -167,9 +227,9 @@ public class Util {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
             //Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
-            new GetMenuTask(mainActivityInstance.getString(R.string.preferences_menu_cache),
-                            mainActivityInstance.getString(R.string.menu_service_url))
-                            .execute();
+
+            new GetMenuTask().execute(mainActivityInstance.getString(R.string.preferences_menu_cache),
+                                      mainActivityInstance.getString(R.string.menu_service_url));
         } else {
             Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
         }

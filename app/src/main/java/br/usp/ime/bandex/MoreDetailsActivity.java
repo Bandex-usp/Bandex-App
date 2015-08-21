@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.Util.Bandejao;
+import br.usp.ime.bandex.tasks.GetMenuTask;
 
 
 public class MoreDetailsActivity extends ActionBarActivity {
