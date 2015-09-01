@@ -19,35 +19,36 @@ import br.usp.ime.bandex.http.JSONGetter;
 */                                 //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
 public abstract class JsonTask extends AsyncTask<String, String, String[]> {
     private ProgressDialog pDialog;
+    public abstract int getTaskId();
+    public abstract String getUpdateMessage();
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         pDialog = new ProgressDialog(Util.mainActivityInstance);
-        pDialog.setMessage("Atualizando...");
+        pDialog.setMessage(getUpdateMessage());
         pDialog.setIndeterminate(false);
-        pDialog.setCancelable(false);
+        pDialog.setCancelable(true);
         pDialog.show();
     }
 
     @Override
     protected String[] doInBackground(String... args) { //preferences_key, url
+        String preferences_key = args[0];
+        String url = args[1];
         // Getting JSON from URL
         JSONGetter jsonGetter = new JSONGetter();
-        String json = jsonGetter.getJSONFromUrl(args[1]);
-        return new String[] {args[0], json}; // parametro do on post execute
+        String json = jsonGetter.getJSONFromUrl(url);
+        return new String[] {preferences_key, json}; // parametro do on post execute
     }
 
     @Override
     protected void onPostExecute(String []args) { //preferences_key, json
+        String preferences_key = args[0];
+        String json = args[1];
         super.onPostExecute(args);
-        Util.setJson(args[0], args[1]);
+        Util.setJson(preferences_key, json);
         pDialog.dismiss();
-        SharedPreferences sharedPref = Util.mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(args[0], args[1]);
-        editor.commit();
-        jsonToModelAndScreen();
+        Util.mainActivityInstance.jsonHandler.sendEmptyMessage(getTaskId());
     }
-    public abstract void jsonToModelAndScreen();
 }

@@ -16,6 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class EvaluateLineActivity extends ActionBarActivity {
 
@@ -36,23 +43,28 @@ public class EvaluateLineActivity extends ActionBarActivity {
                 if (evaluation == 0) {
                     (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5 estrelas!", Toast.LENGTH_SHORT)).show();
                 } else {
-                    if (chosenRestaurant == 1) {
-                        (Toast.makeText(getApplicationContext(), "Central avaliado com sucesso! ", Toast.LENGTH_SHORT)).show();
-                    }
-                    else if (chosenRestaurant == 2) {
-                        (Toast.makeText(getApplicationContext(), "Química avaliada com sucesso!", Toast.LENGTH_SHORT)).show();
-                    }
-                    else if (chosenRestaurant == 3) {
-                        (Toast.makeText(getApplicationContext(), "Física avaliada com sucesso!", Toast.LENGTH_SHORT)).show();
-                    }
-                    else {
+                    if (chosenRestaurant == 0) {
                         (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
+                    } else {
+                        avaliar(evaluation, chosenRestaurant);
+                        (Toast.makeText(getApplicationContext(), "Central avaliado com sucesso! ", Toast.LENGTH_SHORT)).show();
                     }
                 }
             }
         });
     }
 
+    public void avaliar(int evaluation, int chosenRestaurant) {
+        JSONObject post = new JSONObject();
+        try {
+            post.put("restaurant_id", chosenRestaurant);
+            post.put("status", evaluation);
+            post.put("submit_date", Calendar.getInstance().getTime());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();

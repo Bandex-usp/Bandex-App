@@ -1,57 +1,40 @@
 package br.usp.ime.bandex;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.internal.view.SupportActionModeWrapper;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.beardedhen.androidbootstrap.BootstrapButton;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
-
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import br.usp.ime.bandex.http.JSONGetter;
-import br.usp.ime.bandex.model.Bandex;
-import br.usp.ime.bandex.model.Cardapio;
-import br.usp.ime.bandex.model.Day;
+import com.beardedhen.androidbootstrap.BootstrapButton;
 
 import br.usp.ime.bandex.Util.Bandejao;
+import br.usp.ime.bandex.model.Cardapio;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
     static TextView[][] tvInfo = new TextView[3][2]; // tvInfo[0][1] é a sobremesa do central
+    public Handler jsonHandler;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setTextViews();
+        setOnClickListeners();
+        Util.setMainActivityInstance(this);
+        setJsonHandler(); // aguarda pelo json e mostra na tela
+        Util.setMenuStrings();
+        Util.setLineStrings();
+        Util.setCustomActionBar(this);
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -113,22 +96,36 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    public void setLineStatus() {
-        //todo: Fazer o get do serviço de filas
+
+    public void hideModelButtons() {
+
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setTextViews();
-        setOnClickListeners();
-        Util.setMainActivityInstance(this);
-        Util.setMenuStrings();
-        Util.setLineStrings();
-        Util.setCustomActionBar(this);
-
-        setLineStatus();
+    private void setJsonHandler() {
+        jsonHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
+                    case 0:
+                        if (Util.jsonMenuToModel()) {
+                            showModelContentOnScreen();
+                        } else {
+                            hideModelButtons();
+                            Toast.makeText(getApplicationContext(), "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case 1:
+                        if (Util.jsonLineToModel()) {
+                            // mostrar na tela
+                        } else {
+                            // esconder info da fila
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     public void setOnClickListeners() {

@@ -1,14 +1,11 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import br.usp.ime.bandex.http.JSONGetter;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
@@ -97,7 +92,6 @@ public class Util {
     }
 
     public static void setJson(String preferences_key, String value) {
-        System.out.println("not ok. preferences_key: " + preferences_key);
         if (mainActivityInstance.getString(R.string.preferences_menu_cache).equals(preferences_key)) { // definindo menu json
             jsonMenuRepresentation = value;
             Log.d("Debug setMenuJSon", "ok");
@@ -105,6 +99,11 @@ public class Util {
             jsonLineRepresentation = value;
             Log.d("Debug setLineJSon", "ok");
         }
+
+        SharedPreferences sharedPref = mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(preferences_key, value);
+        editor.apply();
     }
 
     public static void setLineStrings() {
@@ -115,15 +114,15 @@ public class Util {
             new LineJsonTask().execute(mainActivityInstance.getString(R.string.preferences_line_cache),
                     mainActivityInstance.getString(R.string.line_service_url));
         } else {
-            Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static boolean jsonLineToModel(String jrsonStr) {
+    public static boolean jsonLineToModel() {
         currentLineStatus = new float[3];
         long pesos[] = new long[3];
         try {
-            JSONArray jsonMenu = new JSONArray(jrsonStr);
+            JSONArray jsonMenu = new JSONArray(jsonLineRepresentation);
             int len = jsonMenu.length();
             for (int j = 0; j < len; j++) { // Percorre array de avaliações do json
                 JSONObject jsonAval = jsonMenu.getJSONObject(j);
@@ -142,6 +141,7 @@ public class Util {
             }
 
         } catch (Exception e) {
+            Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
             return false;
         }
@@ -173,11 +173,7 @@ public class Util {
                 }
                 else {
                     jsonMenuRepresentation = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_menu_cache), null);
-                    if (jsonMenuToModel(jsonMenuRepresentation)) {
-                        mainActivityInstance.showModelContentOnScreen();
-                    } else {
-                        Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
-                    }
+                    Util.mainActivityInstance.jsonHandler.sendEmptyMessage(0); // 0 = menu
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -187,9 +183,9 @@ public class Util {
     }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public static boolean jsonMenuToModel(String jsonStr) {
+    public static boolean jsonMenuToModel() {
         try {
-            JSONArray jsonMenu = new JSONArray(jsonStr);
+            JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
             List<Day> days;
             JSONObject jsonBandex;
             JSONArray jsonArrayBandexDays;
@@ -222,6 +218,7 @@ public class Util {
                 restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
             } // array de restaurantes do json
         } catch (JSONException e) {
+            Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
             Log.e("JsonParser", "Falha ao ler os atributos do json.");
             e.printStackTrace();
             return false;

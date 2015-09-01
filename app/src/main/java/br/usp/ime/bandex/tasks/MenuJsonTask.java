@@ -9,11 +9,10 @@ import br.usp.ime.bandex.Util;
  */
 public class MenuJsonTask extends JsonTask {
 
-    public void jsonToModelAndScreen() {
-        if (Util.jsonMenuToModel(Util.jsonMenuRepresentation)) {
-            Util.mainActivityInstance.showModelContentOnScreen();
-        } else {
-            Toast.makeText(Util.mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
-        }
+    @Override
+    public String getUpdateMessage() {
+        return "Atualizando o cardápio...";
     }
+
+    public int getTaskId() { return 0; }
 }
