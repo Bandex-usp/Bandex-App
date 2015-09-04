@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,29 +37,9 @@ import br.usp.ime.bandex.tasks.MenuJsonTask;
  */
 public class Util {
 
-    static Date entry_date = null;
-    static Calendar horariosBandex[] = new Calendar[4]; // lunch_start, dinner_start, lunch_end, dinner_end
-    static String horariosStr[] = {"11:30:00", "17:30:00", "14:15:00", "19:45:00"};
-    static {
-        try {
-            for (int i = 0; i < 4; i++) {
-                horariosBandex[i] = Calendar.getInstance();
-                horariosBandex[i].setTime(new SimpleDateFormat("HH:mm:ss").parse(horariosStr[i]));
-            }
-        } catch (ParseException p) {
-            p.printStackTrace();
-        }
 
-    }
-
-    static final int LUNCH_START_HOUR = 11;
-    static final int LUNCH_START_MINUTE = 30;
-    static final int LUNCH_END_HOUR = 14;
-    static final int LUNCH_END_MINUTE = 30;
-    static final int DINNER_START_HOUR = 17;
-    static final int DINNER_START_MINUTE = 30;
-    static final int DINNER_END_HOUR = 19;
-    static final int DINNER_END_MINUTE = 45;
+    public static final int MENU_JSON_TASK_ID = 0;
+    public static final int LINE_JSON_TASK_ID = 1;
     public static MainActivity mainActivityInstance;
     private static SharedPreferences sharedPreferences;
     public static String jsonMenuRepresentation;
@@ -66,17 +47,46 @@ public class Util {
     public static Bandex[] restaurantes;
     public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
+    public static Date entry_date = null;
 
-    public static enum Bandejao  {
-        CENTRAL(0),
-        QUIMICA(1),
-        FISICA(2);
-        private int valor = 0;
-        Bandejao(int valorOpcao) {
-            valor = valorOpcao;
-        }
-        public static int getValor(Bandejao bandex) {
-            return bandex.valor;
+    public static class Fila {
+        private static String ENORME = "Fila Enorme"; //5
+        private static String GRANDE = "Fila Grande"; //4
+        private static String MEDIA = "Fila Média"; //3
+        private static String PEQUENA = "Fila Pequena";
+        private static String MUITO_PEQUENA = "Fila Muito Pequena";
+
+        public static final String CLASSIFICACAO[] = new String[] {MUITO_PEQUENA, PEQUENA, MEDIA, GRANDE, ENORME };
+        public static final int COR[] = new int[] {R.color.blue, R.color.green, R.color.yellow, R.color.red2, R.color.red};
+
+    }
+
+    public static class Bandejao  {
+        public static int CENTRAL = 0, QUIMICA = 1, FISICA = 2;
+    }
+
+    public static class Periodo  {
+        public static int LUNCH = 0, DINNER = 1, NOTHING = 2;
+        public static Calendar horarioAlmoco[] = new Calendar[2];
+        public static Calendar horarioJantar[] = new Calendar[2];
+        private static String horariosAlmocoStr[] = {"11:30:00", "14:15:00"};
+        private static String horariosJantarStr[] = {"17:30:00", "19:45:00"};
+        public static int INICIO = 0, FIM = 1;
+        static {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                for (int i = 0; i < 2; i++) {
+                    horarioAlmoco[i] = Calendar.getInstance();
+                    horarioAlmoco[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").
+                            parse(sdf.format(horarioAlmoco[i].getTime()) + " " + horariosAlmocoStr[i]));
+                    horarioJantar[i] = Calendar.getInstance();
+                    horarioJantar[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").
+                            parse(sdf.format(horarioJantar[i].getTime()) + " " + horariosJantarStr[i]));
+                }
+            } catch (ParseException p) {
+                p.printStackTrace();
+            }
+
         }
     }
 
@@ -84,71 +94,69 @@ public class Util {
         mainActivityInstance = instance;
     }
 
-    public static void setMenuStrings() {
+    public static void setMenuStrings(Activity caller, Handler handler) {
         if (!getMenuFromCache()) {
             Log.d("setMenu", "Getting menu from internet");
-            getMenuFromInternet();
+            getMenuFromInternet(caller, handler);
         }
     }
 
-    public static void setJson(String preferences_key, String value) {
-        if (mainActivityInstance.getString(R.string.preferences_menu_cache).equals(preferences_key)) { // definindo menu json
-            jsonMenuRepresentation = value;
-            Log.d("Debug setMenuJSon", "ok");
-        } else if (mainActivityInstance.getString(R.string.preferences_line_cache).equals(preferences_key)) { // definindo line json
-            jsonLineRepresentation = value;
-            Log.d("Debug setLineJSon", "ok");
+    public static void setJson(int taskID, String value) {
+        switch (taskID) {
+            case Util.LINE_JSON_TASK_ID:
+                jsonLineRepresentation = value;
+                Log.d("Debug setLineJson", "ok");
+                break;
+            case Util.MENU_JSON_TASK_ID:
+                jsonMenuRepresentation = value;
+                Log.d("Debug setMenuJson", "ok");
+                break;
         }
 
+        String preferences_keys[] = {mainActivityInstance.getString(R.string.preferences_menu_cache),
+                mainActivityInstance.getString(R.string.preferences_line_cache)};
         SharedPreferences sharedPref = mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(preferences_key, value);
+        editor.putString(preferences_keys[taskID], value);
         editor.apply();
     }
 
-    public static void setLineStrings() {
+    static void getLineFromInternet(Activity caller, Handler handler) {
+        if (getPeriodToShowLine() == Periodo.NOTHING) return;
         ConnectivityManager connMgr = (ConnectivityManager)
-                mainActivityInstance.getSystemService(Context.CONNECTIVITY_SERVICE);
+                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new LineJsonTask().execute(mainActivityInstance.getString(R.string.preferences_line_cache),
-                    mainActivityInstance.getString(R.string.line_service_url));
+            new LineJsonTask(caller, handler).execute(caller.getString(R.string.line_get_service_url));
         } else {
-            Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(caller.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static boolean jsonLineToModel() {
-        currentLineStatus = new float[3];
-        long pesos[] = new long[3];
+    public static void setLineStrings(Activity caller, Handler handler) {
+        getLineFromInternet(caller, handler);
+    }
+
+    public static boolean jsonLineToModel(Activity caller) {
         try {
-            JSONArray jsonMenu = new JSONArray(jsonLineRepresentation);
-            int len = jsonMenu.length();
-            for (int j = 0; j < len; j++) { // Percorre array de avaliações do json
-                JSONObject jsonAval = jsonMenu.getJSONObject(j);
-                int status = jsonAval.getInt("status");
-                int restaurant_id = jsonAval.getInt("restaurant_id");
-                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(jsonAval.getString("submit_date"));
-                long peso = (submit_date.getTime() - horariosBandex[getPeriod()].getTime().getTime()); // milisegundos
-                pesos[restaurant_id] += peso;
-                currentLineStatus[restaurant_id] += peso * status;
+            JSONObject jsonLine = new JSONObject(jsonLineRepresentation);
+            for (Integer j = 0; j < 3; j++) { // Percorre array de avaliações do json
+                JSONObject jsonRestaurant = jsonLine.getJSONObject(j.toString());
+                int status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
+                String submit_dateStr = jsonRestaurant.getString("last_submit");
+                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(submit_dateStr);
+                restaurantes[j].setLineStatus(status);
+                restaurantes[j].setLast_submit(submit_date);
             }
-
-            for (int i = 0; i < 3; i++) {
-                if (pesos[i] != 0) {
-                    currentLineStatus[i] = currentLineStatus[i] / pesos[i];
-                }
-            }
-
         } catch (Exception e) {
-            Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(caller, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
             return false;
         }
         return true;
     }
 
-    // Returns true if could get menu from cache successfully, false otherwise
+    // Returns true if could get menu from cache successfully, false otherwise. Se conseguiu, ainda verifica se está desatualizado. Se estiver, retorna false.
     public static boolean getMenuFromCache() {
         sharedPreferences = mainActivityInstance.getPreferences(Activity.MODE_PRIVATE);
         String string_entry_date = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_entry_date_cache), null);
@@ -173,7 +181,7 @@ public class Util {
                 }
                 else {
                     jsonMenuRepresentation = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_menu_cache), null);
-                    Util.mainActivityInstance.jsonHandler.sendEmptyMessage(0); // 0 = menu
+                    Util.mainActivityInstance.jsonHandler.sendEmptyMessage(MENU_JSON_TASK_ID);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -183,8 +191,11 @@ public class Util {
     }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public static boolean jsonMenuToModel() {
+    public static boolean jsonMenuToModel(Activity caller) {
         try {
+            if (jsonMenuRepresentation == null) {
+                return false;
+            }
             JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
             List<Day> days;
             JSONObject jsonBandex;
@@ -218,7 +229,7 @@ public class Util {
                 restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
             } // array de restaurantes do json
         } catch (JSONException e) {
-            Toast.makeText(mainActivityInstance, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(caller, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
             Log.e("JsonParser", "Falha ao ler os atributos do json.");
             e.printStackTrace();
             return false;
@@ -226,31 +237,22 @@ public class Util {
         return true;
     }
 
-    public static void getMenuFromInternet() {
+    public static void getMenuFromInternet(Activity caller, Handler handler) {
         ConnectivityManager connMgr = (ConnectivityManager)
-                mainActivityInstance.getSystemService(Context.CONNECTIVITY_SERVICE);
+                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            //Toast.makeText(getApplicationContext(), "Com internet!", Toast.LENGTH_SHORT).show();
-
-            new MenuJsonTask().execute(mainActivityInstance.getString(R.string.preferences_menu_cache),
-                                      mainActivityInstance.getString(R.string.menu_service_url));
+            new MenuJsonTask(caller, handler).execute(mainActivityInstance.getString(R.string.menu_service_url));
         } else {
-            Toast.makeText(mainActivityInstance.getApplicationContext(), "Sem conexão!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(caller.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    static int getPeriod() {
-        int period = 0; // 0 = lunch, 1 = dinner
+    static int getPeriodToShowMenu() {
         Calendar cal = Calendar.getInstance();
-        int hours = cal.get(Calendar.HOUR_OF_DAY);
-        int minutes = cal.get(Calendar.MINUTE);
-        // Choose whether to show the lunch or the dinner
-        if (hours == LUNCH_END_HOUR) {
-            if (minutes >= LUNCH_END_MINUTE) period = 1;
-        } else if (hours > LUNCH_END_HOUR) period = 1;
-        else period = 0;
-        return period;
+        if (cal.before(Periodo.horarioAlmoco[Periodo.FIM]))
+            return Periodo.LUNCH;
+        else return Periodo.DINNER;
     }
 
     static int getDay_of_week() {
@@ -263,42 +265,31 @@ public class Util {
         Util.entry_date = entry_date;
     }
 
-    public static boolean inRangeOfLunch(int hours, int minutes) {
-        if (hours > LUNCH_START_HOUR && hours < LUNCH_END_HOUR) {
+    public static boolean inRangeOfLunch() {
+        Calendar now = Calendar.getInstance();
+        if (Periodo.horarioAlmoco[Periodo.INICIO].before(now) &&
+                now.before(Periodo.horarioAlmoco[Periodo.FIM])) {
             return true;
-        } else if (hours == LUNCH_START_HOUR) {
-            if (minutes >= LUNCH_START_MINUTE) return true;
-        } else if (hours == LUNCH_END_HOUR) {
-            if (minutes <= LUNCH_END_MINUTE) return true;
-        }
-        return false;
+        } else return false;
     }
 
-    public static boolean inRangeOfDinner(int hours, int minutes) {
-        if (hours > DINNER_START_HOUR && hours < DINNER_END_HOUR) {
+    public static boolean inRangeOfDinner() {
+        Calendar now = Calendar.getInstance();
+        if (Periodo.horarioJantar[Periodo.INICIO].before(now) &&
+                now.before(Periodo.horarioJantar[Periodo.FIM])) {
             return true;
-        } else if (hours == DINNER_START_HOUR) {
-            if (minutes >= DINNER_START_MINUTE) return true;
-        } else if (hours == DINNER_END_HOUR) {
-            if (minutes <= DINNER_END_MINUTE) return true;
-        }
-        return false;
+        } else return false;
     }
 
-    public static int getLinePeriod() {
-        int period; // 0 = lunch, 1 = dinner, 2 = nothing
-        Calendar cal = Calendar.getInstance();
-        int hours = cal.get(Calendar.HOUR_OF_DAY);
-        int minutes = cal.get(Calendar.MINUTE);
-        if (inRangeOfLunch(hours, minutes)) {
-            period = 0;
-        } else if (inRangeOfDinner(hours, minutes)) {
-            period = 1;
-        } else period = 2;
-        return period;
+    public static int getPeriodToShowLine() {
+        if (inRangeOfLunch()) {
+            return Periodo.LUNCH;
+        } else if (inRangeOfDinner()) {
+            return Periodo.DINNER;
+        } else return Periodo.NOTHING;
     }
 
-    public static void setCustomActionBar(final ActionBarActivity context) {
+    public static void setCustomActionBar(final ActionBarActivity context, final Handler handler) {
         android.support.v7.app.ActionBar mActionBar = context.getSupportActionBar();
         mActionBar.setDisplayShowHomeEnabled(false);
         mActionBar.setDisplayShowTitleEnabled(false);
@@ -316,10 +307,10 @@ public class Util {
 
             @Override
             public void onClick(View view) {
-
-
-                Toast.makeText(context, "Refresh Clicked!",
-                        Toast.LENGTH_LONG).show();
+                if (handler != null) {
+                    getMenuFromInternet(context, handler);
+                    getLineFromInternet(context, handler);
+                }
             }
         });
         mActionBar.setCustomView(mCustomView);

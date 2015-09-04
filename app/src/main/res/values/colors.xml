@@ -6,4 +6,15 @@
     <color name="fundo_site_usp_old">#F2F1E6</color>
     <color name="fundo_site_usp">#EEEEEE</color>
 
+    <color name="blue">#0000FF</color>
+    <color name="green">#008000</color>
+    <color name="yellow">#fcb421</color>
+    <color name="red2">#dd7b7b</color>
+    <color name="red">#FF0000</color>
+
+
+
+
+
+
 </resources>

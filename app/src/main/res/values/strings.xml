@@ -22,8 +22,32 @@
     <string name="title_regular_line">Fila Média</string>
     <string name="title_bad_line">Fila Grande</string>
     <string name="title_horrible_line">Fila Enorme</string>
+
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
-    <string name="line_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
+    <string name="line_post_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
+    <string name="line_get_service_url">http://bandexweb.herokuapp.com/line_status.json</string>
+
+
+    <string name="title_updating_line">Atualizando a fila...</string>
+    <string name="title_updating_menu">Atualizando o cardápio...</string>
+    <string name="title_updated_menu">Cardápio atualizado!</string>
+    <string name="title_updated_line">Status da fila atualizado!</string>
+
+    <string name="title_main_dish">Principal</string>
+    <string name="title_dessert">Sobremesa</string>
+    <string name="title_meat">Carne</string>
+    <string name="title_side_dish">Acompanhamento</string>
+    <string name="title_salad">Salada</string>
+    <string name="title_optional">Opcional</string>
+    <string name="title_line_status">Status da Fila</string>
+    <string name="title_current_date">Data atual</string>
+    <string name="title_last_evaluation">Última avaliação: </string>
+    <string name="last_evaluation_time">Horário</string>
+
+    <string name="title_lunch">Almoço</string>
+    <string name="title_dinner">Jantar</string>
+    <string name="line_status_prompt">Dê uma nota para a fila</string>
+    <string name="restaurant_prompt">Escolha um Bandejão</string>
 
 
 
@@ -33,7 +57,6 @@
     <string name="preferences_line_cache">line_cache</string>
     <string name="preferences_menu_cache">menu_cache</string>
     <string name="preferences_entry_date_cache">entry_date</string>
-    <string name="title_foo">foo</string>
     <string name="title_activity_more_details">Mais detalhes</string>
 
     <string name="title_activity_evaluate_line">Avaliação da Fila</string>

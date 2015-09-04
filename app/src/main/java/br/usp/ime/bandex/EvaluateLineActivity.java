@@ -33,7 +33,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate_line);
-        Util.setCustomActionBar(this);
+        Util.setCustomActionBar(this, null);
         BootstrapButton btn_send = (BootstrapButton) findViewById(R.id.activity_evaluate_line_btn_send);
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override

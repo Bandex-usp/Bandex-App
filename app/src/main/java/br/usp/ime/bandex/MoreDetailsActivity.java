@@ -1,5 +1,8 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,12 +11,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
+
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.Util.Bandejao;
+import br.usp.ime.bandex.Util.Periodo;
+import br.usp.ime.bandex.Util.Fila;
 
 
 public class MoreDetailsActivity extends ActionBarActivity {
@@ -24,33 +34,30 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
     Spinner spinner1;
     LinearLayout ll_info_cardapio;
-
+    public Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_details);
-        Util.setCustomActionBar(this);
-        currentPeriodOnScreen = Util.getPeriod();
+        setJsonHandler();
+        Util.setCustomActionBar(this, handler);
+        currentPeriodOnScreen = Util.getPeriodToShowMenu();
         currentDayOfWeekOnScreen = Util.getDay_of_week();
         ll_info_cardapio = (LinearLayout) findViewById(R.id.info_cardapio);
-
-        int restaurantId;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras == null) {
-                currentRestaurantOnScreen = Bandejao.getValor(Bandejao.CENTRAL);
+                currentRestaurantOnScreen = Bandejao.CENTRAL;
             } else {
-                currentRestaurantOnScreen = Bandejao.getValor((Bandejao) extras.get((MainActivity.EXTRA_RESTAURANTE)));
+                currentRestaurantOnScreen = (int) extras.get((MainActivity.EXTRA_RESTAURANTE));
             }
         } else {
-            currentRestaurantOnScreen = Bandejao.getValor((Bandejao) savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE));
+            currentRestaurantOnScreen = (int)  savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
         }
-
-        RadioButton rbSelected = Util.getPeriod() == 0 ?
+        RadioButton rbSelected = Util.getPeriodToShowMenu() == Periodo.LUNCH ?
                 (RadioButton) findViewById(R.id.activity_more_details_rb_almoco) :
                 (RadioButton) findViewById(R.id.activity_more_details_rb_jantar);
         rbSelected.setChecked(true);
-        showMenuAndLineByRestaurant(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriod());
         TextView tv_bandex = (TextView) findViewById(R.id.activity_more_details_tv_title_bandex);
         tv_bandex.setText(Util.restaurantNames[currentRestaurantOnScreen]);
         spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
@@ -59,12 +66,14 @@ public class MoreDetailsActivity extends ActionBarActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 currentDayOfWeekOnScreen = position;
-                showMenuAndLineByRestaurant(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
+                showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
+                showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                showMenuAndLineByRestaurant(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriod());
+                showLineContentOnScreen(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriodToShowMenu());
+                showMenuContentOnScreen(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriodToShowMenu());
             }
         });
     }
@@ -76,70 +85,108 @@ public class MoreDetailsActivity extends ActionBarActivity {
     }
 
     public void updateLineStatus(View view) {
-        Toast.makeText(this, "Status da fila atualizado!", Toast.LENGTH_SHORT).show();
+        Util.getLineFromInternet(this, handler);
     }
 
-    public void updateMenu(View view) {
-        Util.getMenuFromInternet();
+    private void setJsonHandler() {
+        final Activity caller = this;
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
+                    case Util.MENU_JSON_TASK_ID:
+                        if (Util.jsonMenuToModel(caller)) {
+                            showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case Util.LINE_JSON_TASK_ID:
+                        if (Util.jsonLineToModel(caller)) {
+                            showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);// mostrar na tela
+                        } else {
+                            // esconder info da fila
+                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+    }
+
+    public void updateMenu() {
+        Util.getMenuFromInternet(this, handler);
         Toast.makeText(this, "Cardápio atualizado!", Toast.LENGTH_SHORT).show();
     }
 
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
-        int periodSelected = 0;
+        int periodSelected = Periodo.LUNCH;
         // Check which radio button was clicked
         switch(view.getId()) {
             case R.id.activity_more_details_rb_almoco:
                 if (checked)
-                    periodSelected = 0;
+                    periodSelected = Periodo.LUNCH;
                 break;
             case R.id.activity_more_details_rb_jantar:
                 if (checked)
-                    periodSelected = 1;
+                    periodSelected = Periodo.DINNER;
                 break;
         }
         if (checked) {
-            showMenuAndLineByRestaurant(currentRestaurantOnScreen, currentDayOfWeekOnScreen, periodSelected);
+            showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, periodSelected);
+            showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, periodSelected);
         }
     }
 
-    public boolean isClosed(Bandex restaurant, int day_of_week, int period) {
-        return restaurant.getDays().get(day_of_week).getDay()[period] == null;
+    public boolean isClosed(int restaurant_id, int day_of_week, int period) {
+        return Util.restaurantes[restaurant_id].getDays().get(day_of_week).getDay()[period] == null;
     }
 
-    public void showMenu(Bandex restaurant, int day_of_week, int period) {
-        ll_info_cardapio.setVisibility(View.VISIBLE);
-        TextView tv_main = (TextView) findViewById(R.id.activity_more_details_tv_main);
-        TextView tv_meat = (TextView) findViewById(R.id.activity_more_details_tv_meat);
-        TextView tv_second = (TextView) findViewById(R.id.activity_more_details_tv_second);
-        TextView tv_salad = (TextView) findViewById(R.id.activity_more_details_tv_salad);
-        TextView tv_optional = (TextView) findViewById(R.id.activity_more_details_tv_optional);
-        TextView tv_desert = (TextView) findViewById(R.id.activity_more_details_tv_desert);
-        tv_main.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMain());
-        tv_meat.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMeat());
-        tv_second.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSecond());
-        tv_salad.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSalad());
-        tv_optional.setText(restaurant.getDays().get(day_of_week).getDay()[period].getOptional().trim());
-        tv_desert.setText(restaurant.getDays().get(day_of_week).getDay()[period].getDesert());
-    }
-
-    public void showMenuAndLineByRestaurant(int restaurant_id, int day_of_week, int period) {
-        currentDayOfWeekOnScreen = day_of_week;
-        currentPeriodOnScreen = period;
-        LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
-        if (currentPeriodOnScreen != Util.getLinePeriod() || currentDayOfWeekOnScreen != Util.getDay_of_week()) {
-            ll_fila.setVisibility(View.INVISIBLE);
-        } else {
-            ll_fila.setVisibility(View.VISIBLE);
-        }
+    public void showMenuContentOnScreen(int restaurant_id, int day_of_week, int period) {
         Bandex restaurant = Util.restaurantes[restaurant_id];
         TextView tv_entry_date = (TextView) findViewById(R.id.tv_entry_date);
         tv_entry_date.setText(restaurant.getDays().get(day_of_week).getEntry_DateS());
-        if (isClosed(restaurant, day_of_week, period)) {
+        if (isClosed(restaurant_id, day_of_week, period)) {
             showClosed();
         } else {
-            showMenu(restaurant, day_of_week, period);
+            ll_info_cardapio.setVisibility(View.VISIBLE);
+            TextView tv_main = (TextView) findViewById(R.id.activity_more_details_tv_main);
+            TextView tv_meat = (TextView) findViewById(R.id.activity_more_details_tv_meat);
+            TextView tv_second = (TextView) findViewById(R.id.activity_more_details_tv_second);
+            TextView tv_salad = (TextView) findViewById(R.id.activity_more_details_tv_salad);
+            TextView tv_optional = (TextView) findViewById(R.id.activity_more_details_tv_optional);
+            TextView tv_desert = (TextView) findViewById(R.id.activity_more_details_tv_desert);
+            tv_main.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMain());
+            tv_meat.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMeat());
+            tv_second.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSecond());
+            tv_salad.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSalad());
+            tv_optional.setText(restaurant.getDays().get(day_of_week).getDay()[period].getOptional().trim());
+            tv_desert.setText(restaurant.getDays().get(day_of_week).getDay()[period].getDesert());
+        }
+    }
+
+    public void showLineContentOnScreen(int restaurant_id, int day_of_week, int period) {
+        LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
+        if (Util.jsonLineRepresentation == null || Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                period != Util.getPeriodToShowLine() ||
+                day_of_week != Util.getDay_of_week() ||
+                isClosed(restaurant_id, day_of_week, period)) {
+            ll_fila.setVisibility(View.INVISIBLE);
+        } else {
+            ll_fila.setVisibility(View.VISIBLE);
+            TextView tv_line_status = (TextView) findViewById(R.id.activity_more_details_tv_line_evaluation_category);
+            RatingBar ratingBar_line_status = (RatingBar) findViewById(R.id.ratingBar2);
+
+            tv_line_status.setText(Fila.CLASSIFICACAO[Util.restaurantes[restaurant_id].getLineStatus()]);
+            tv_line_status.setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[restaurant_id].getLineStatus()]));
+            ratingBar_line_status.setRating(1 + Util.restaurantes[restaurant_id].getLineStatus());
+            ratingBar_line_status.setNumStars(1 + Util.restaurantes[restaurant_id].getLineStatus());
+            TextView tvLastSubmit = (TextView) findViewById(R.id.last_evaluation_time);
+            tvLastSubmit.setText((new SimpleDateFormat("dd/MM/yyyy HH:mm")).format(Util.restaurantes[restaurant_id].getLast_submit()));
         }
     }
 

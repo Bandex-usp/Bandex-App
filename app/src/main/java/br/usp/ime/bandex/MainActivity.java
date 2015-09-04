@@ -1,6 +1,8 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,12 +16,15 @@ import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapButton;
 
 import br.usp.ime.bandex.Util.Bandejao;
+import br.usp.ime.bandex.Util.Fila;
+import br.usp.ime.bandex.Util.Periodo;
+
 import br.usp.ime.bandex.model.Cardapio;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
-    static TextView[][] tvInfo = new TextView[3][2]; // tvInfo[0][1] é a sobremesa do central
+    static TextView[][] tvInfo = new TextView[3][3]; // tvInfo[0][1] é a sobremesa do central
     public Handler jsonHandler;
 
     @Override
@@ -27,12 +32,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTextViews();
-        setOnClickListeners();
         Util.setMainActivityInstance(this);
         setJsonHandler(); // aguarda pelo json e mostra na tela
-        Util.setMenuStrings();
-        Util.setLineStrings();
-        Util.setCustomActionBar(this);
+        Util.setMenuStrings(this, jsonHandler);
+        Util.setLineStrings(this, jsonHandler);
+        Util.setCustomActionBar(this, jsonHandler);
     }
 
 
@@ -43,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         final int fisica_details = R.id.activity_main_fisica_btn_more_details;
         final int evaluate_line = R.id.activity_main_btn_evaluate_line;
         Class clazz = MoreDetailsActivity.class;
-        Bandejao extra = Bandejao.CENTRAL;
+        int extra = Bandejao.CENTRAL;
         Intent intent;
         Boolean changeActivity = true;
 
@@ -73,52 +77,71 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
     public void setTextViews() {
-        tvInfo[0][0] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
-        tvInfo[0][1] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
-        tvInfo[1][0] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
-        tvInfo[1][1] = (TextView) findViewById(R.id.activity_main_quimica_tv_sobremesa);
-        tvInfo[2][0] = (TextView) findViewById(R.id.activity_main_fisica_tv_mistura);
-        tvInfo[2][1] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
+        int MISTURA = 0, SOBREMESA = 1, FILA = 2;
+        tvInfo[Bandejao.CENTRAL][MISTURA] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
+        tvInfo[Bandejao.CENTRAL][SOBREMESA] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
+        tvInfo[Bandejao.CENTRAL][FILA] = (TextView) findViewById(R.id.activity_main_central_tv_line);
+        tvInfo[Bandejao.QUIMICA][MISTURA] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
+        tvInfo[Bandejao.QUIMICA][SOBREMESA] = (TextView) findViewById(R.id.activity_main_quimica_tv_sobremesa);
+        tvInfo[Bandejao.QUIMICA][FILA] = (TextView) findViewById(R.id.activity_main_quimica_tv_line);
+        tvInfo[Bandejao.FISICA][MISTURA] = (TextView) findViewById(R.id.activity_main_fisica_tv_mistura);
+        tvInfo[Bandejao.FISICA][SOBREMESA] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
+        tvInfo[Bandejao.FISICA][FILA] = (TextView) findViewById(R.id.activity_main_fisica_tv_line);
+
     }
 
-    public void showModelContentOnScreen() {
-        Cardapio meal;
-
-        for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
-            meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriod()];
+    public void showLineContentOnScreen() {
+        int FILA = 2;
+        /*if (Util.getPeriodToShowLine() != Periodo.NOTHING) {
+            return;
+        }*/
+        for (int i = 0; i < 3; i++) {
+            Cardapio meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
             if (meal != null) {
-                tvInfo[i][0].setText(meal.getMeat());
-                tvInfo[i][1].setText(meal.getDesert());
+                tvInfo[i][FILA].setText(Fila.CLASSIFICACAO[Util.restaurantes[i].getLineStatus()]);
+                tvInfo[i][FILA].setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[i].getLineStatus()]));
             } else {
-                tvInfo[i][0].setText("Restaurante Fechado.");
-                tvInfo[i][1].setText("Restaurante Fechado.");
+                tvInfo[i][FILA].setText("");
             }
         }
     }
 
+    public void showMenuContentOnScreen() {
+        Cardapio meal;
+        int MISTURA = 0, SOBREMESA = 1;
 
-    public void hideModelButtons() {
-
+        for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
+            meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
+            if (meal != null) {
+                tvInfo[i][MISTURA].setText(meal.getMeat());
+                tvInfo[i][SOBREMESA].setText(meal.getDesert());
+            } else {
+                tvInfo[i][MISTURA].setText("Restaurante Fechado.");
+                tvInfo[i][SOBREMESA].setText("");
+            }
+        }
+        setOnClickListeners();
     }
 
     private void setJsonHandler() {
+        final Activity caller = this;
         jsonHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
-                    case 0:
-                        if (Util.jsonMenuToModel()) {
-                            showModelContentOnScreen();
+                    case Util.MENU_JSON_TASK_ID:
+                        if (Util.jsonMenuToModel(caller)) {
+                            showMenuContentOnScreen();
                         } else {
-                            hideModelButtons();
-                            Toast.makeText(getApplicationContext(), "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
                         }
                         break;
-                    case 1:
-                        if (Util.jsonLineToModel()) {
-                            // mostrar na tela
+                    case Util.LINE_JSON_TASK_ID:
+                        if (Util.jsonLineToModel(caller)) {
+                            showLineContentOnScreen();// mostrar na tela
                         } else {
                             // esconder info da fila
+                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     default:

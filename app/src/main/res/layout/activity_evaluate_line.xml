@@ -65,7 +65,7 @@
         android:id="@+id/editText2"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:text="Dê uma nota para a fila"
+        android:text="@string/line_status_prompt"
         android:textSize="20sp" />  <!-- Test of commit via browser -->
     <TextView
         android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
         android:id="@+id/editText"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="Escolha um Bandejão"
+        android:text="@string/restaurant_prompt"
         android:textSize="20sp"/>
 
     <com.beardedhen.androidbootstrap.BootstrapButton
