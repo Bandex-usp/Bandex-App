@@ -29,8 +29,8 @@ import java.util.List;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.Cardapio;
 import br.usp.ime.bandex.model.Day;
-import br.usp.ime.bandex.tasks.LineJsonTask;
-import br.usp.ime.bandex.tasks.MenuJsonTask;
+import br.usp.ime.bandex.tasks.GetLineJsonTask;
+import br.usp.ime.bandex.tasks.GetMenuJsonTask;
 
 /**
  * Created by Wagner on 26/07/2015.
@@ -70,7 +70,7 @@ public class Util {
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
         private static String horariosAlmocoStr[] = {"11:30:00", "14:15:00"};
-        private static String horariosJantarStr[] = {"17:30:00", "19:45:00"};
+        private static String horariosJantarStr[] = {"17:30:00", "22:45:00"};
         public static int INICIO = 0, FIM = 1;
         static {
             try {
@@ -127,7 +127,7 @@ public class Util {
                 caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new LineJsonTask(caller, handler).execute(caller.getString(R.string.line_get_service_url));
+            new GetLineJsonTask(caller, handler).execute(caller.getString(R.string.line_get_service_url));
         } else {
             Toast.makeText(caller.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
         }
@@ -138,21 +138,45 @@ public class Util {
     }
 
     public static boolean jsonLineToModel(Activity caller) {
+        JSONObject jsonLine = null;
         try {
-            JSONObject jsonLine = new JSONObject(jsonLineRepresentation);
-            for (Integer j = 0; j < 3; j++) { // Percorre array de avaliações do json
-                JSONObject jsonRestaurant = jsonLine.getJSONObject(j.toString());
-                int status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
-                String submit_dateStr = jsonRestaurant.getString("last_submit");
-                Date submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(submit_dateStr);
-                restaurantes[j].setLineStatus(status);
-                restaurantes[j].setLast_submit(submit_date);
-            }
-        } catch (Exception e) {
-            Toast.makeText(caller, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
+            jsonLine = new JSONObject(jsonLineRepresentation);
+        } catch (JSONException e) {
             e.printStackTrace();
             return false;
         }
+        for (Integer j = 0; j < 3; j++) { // Percorre array de avaliações do json
+                JSONObject jsonRestaurant = null;
+                try {
+                    jsonRestaurant = jsonLine.getJSONObject(j.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                int status = 0;
+                try {
+                    status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String submit_dateStr = null;
+                try {
+                    submit_dateStr = jsonRestaurant.getString("last_submit");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Date submit_date = null;
+                try {
+                    submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(submit_dateStr);
+                } catch (ParseException e) {
+                    status = 0;
+                    submit_date = null;
+                    e.printStackTrace();
+                }
+            if (status > 4) status = 4;
+                restaurantes[j].setLineStatus(status);
+                restaurantes[j].setLast_submit(submit_date);
+            }
         return true;
     }
 
@@ -242,7 +266,7 @@ public class Util {
                 caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new MenuJsonTask(caller, handler).execute(mainActivityInstance.getString(R.string.menu_service_url));
+            new GetMenuJsonTask(caller, handler).execute(mainActivityInstance.getString(R.string.menu_service_url));
         } else {
             Toast.makeText(caller.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
         }

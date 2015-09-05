@@ -43,6 +43,9 @@
     <string name="title_current_date">Data atual</string>
     <string name="title_last_evaluation">Última avaliação: </string>
     <string name="last_evaluation_time">Horário</string>
+    <string name="sucess_evaluated">Avaliado com sucesso!</string>
+    <string name="evaluating">Avaliando...</string>
+    <string name="evaluate_error">Ops... Não foi possível avaliar</string>
 
     <string name="title_lunch">Almoço</string>
     <string name="title_dinner">Jantar</string>

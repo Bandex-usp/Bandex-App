@@ -2,25 +2,17 @@ package br.usp.ime.bandex.tasks;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import br.usp.ime.bandex.MainActivity;
-import br.usp.ime.bandex.R;
 import br.usp.ime.bandex.Util;
-import br.usp.ime.bandex.http.JSONGetter;
+import br.usp.ime.bandex.http.StringGetter;
 
 /**
  * Created by Wagner on 09/05/2015.
 */                                 //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
-public abstract class JsonTask extends AsyncTask<String, String, String> {
+public abstract class GetJsonTask extends AsyncTask<String, String, String> {
     private ProgressDialog pDialog;
     public abstract int getTaskId();
     public abstract String getUpdateMessage();
@@ -41,8 +33,8 @@ public abstract class JsonTask extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... urls) {
         // Getting JSON from URL
-        JSONGetter jsonGetter = new JSONGetter();
-        String json = jsonGetter.getJSONFromUrl(urls[0]);
+        StringGetter stringGetter = new StringGetter();
+        String json = stringGetter.getStringFromUrl(urls[0]);
         return json; // parametro do on post execute
     }
 

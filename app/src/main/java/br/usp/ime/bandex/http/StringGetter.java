@@ -20,20 +20,20 @@ import org.json.JSONException;
 
 import android.util.Log;
 
-public class JSONGetter {
+public class StringGetter {
 
     static InputStream is = null;
-    static String json = "";
+    static String returnValue = "";
 
     // constructor
-    public JSONGetter() {
+    public StringGetter() {
 
     }
 
-    /* Returns the JSONArray corresponding to the url
+    /* Returns the String corresponding to the url
        Returns null if any error occurred, like internet connection down
     */
-    public String getJSONFromUrl(String url) {
+    public String getStringFromUrl(String url) {
 
         // Making HTTP request
         try {
@@ -60,16 +60,16 @@ public class JSONGetter {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     is, "iso-8859-1"), 8);
             StringBuilder sb = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(new String(line.getBytes("ISO-8859-1"), "UTF-8"));
             }
             is.close();
-            json = sb.toString();
+            returnValue = sb.toString();
         } catch (Exception e) {
             Log.e("Buffer Error", "Error converting result " + e.toString());
             return null;
         }
-        return json;
+        return returnValue;
     }
 }

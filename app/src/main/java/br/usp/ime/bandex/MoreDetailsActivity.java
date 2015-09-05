@@ -174,7 +174,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         if (Util.jsonLineRepresentation == null || Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 period != Util.getPeriodToShowLine() ||
                 day_of_week != Util.getDay_of_week() ||
-                isClosed(restaurant_id, day_of_week, period)) {
+                isClosed(restaurant_id, day_of_week, period) || Util.restaurantes[restaurant_id].getLast_submit() == null) {
             ll_fila.setVisibility(View.INVISIBLE);
         } else {
             ll_fila.setVisibility(View.VISIBLE);

@@ -20,13 +20,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import br.usp.ime.bandex.Util.Bandejao;
+
+import br.usp.ime.bandex.tasks.PostJsonTask;
 
 
 public class EvaluateLineActivity extends ActionBarActivity {
 
-    public int chosenRestaurant = 0; //1 = Central, 2 = Química, 3 = Física, 0 = nenhum
+    public int NOTHING = 3;
+    public int chosenRestaurant = NOTHING;
     public int evaluation = 0; // Valores possíveis: 1 a 5
 
     @Override
@@ -41,13 +46,12 @@ public class EvaluateLineActivity extends ActionBarActivity {
                 RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
                 evaluation = (int) ratingBar.getRating();
                 if (evaluation == 0) {
-                    (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5 estrelas!", Toast.LENGTH_SHORT)).show();
+                    (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5!", Toast.LENGTH_SHORT)).show();
                 } else {
-                    if (chosenRestaurant == 0) {
+                    if (chosenRestaurant == NOTHING) {
                         (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
                     } else {
-                        avaliar(evaluation, chosenRestaurant);
-                        (Toast.makeText(getApplicationContext(), "Central avaliado com sucesso! ", Toast.LENGTH_SHORT)).show();
+                        avaliar(evaluation-1, chosenRestaurant);
                     }
                 }
             }
@@ -55,11 +59,12 @@ public class EvaluateLineActivity extends ActionBarActivity {
     }
 
     public void avaliar(int evaluation, int chosenRestaurant) {
-        JSONObject post = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
         try {
-            post.put("restaurant_id", chosenRestaurant);
-            post.put("status", evaluation);
-            post.put("submit_date", Calendar.getInstance().getTime());
+            jsonObject.put("restaurant_id", chosenRestaurant);
+            jsonObject.put("status", evaluation);
+            jsonObject.put("submit_date", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()));
+            (new PostJsonTask(this)).execute(jsonObject.toString(), getString(R.string.line_post_service_url));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -73,15 +78,15 @@ public class EvaluateLineActivity extends ActionBarActivity {
         switch(view.getId()) {
             case R.id.activity_evaluate_line_rb_central:
                 if (checked)
-                    chosenRestaurant = 1;
+                    chosenRestaurant = Bandejao.CENTRAL;
                 break;
             case R.id.activity_evaluate_line_rb_quimica:
                 if (checked)
-                    chosenRestaurant = 2;
+                    chosenRestaurant = Bandejao.QUIMICA;
                 break;
             case R.id.activity_evaluate_line_rb_fisica:
                 if (checked)
-                    chosenRestaurant = 3;
+                    chosenRestaurant = Bandejao.FISICA;
                     break;
         }
     }

@@ -98,8 +98,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         for (int i = 0; i < 3; i++) {
             Cardapio meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
             if (meal != null) {
-                tvInfo[i][FILA].setText(Fila.CLASSIFICACAO[Util.restaurantes[i].getLineStatus()]);
-                tvInfo[i][FILA].setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[i].getLineStatus()]));
+                if (Util.restaurantes[i].getLast_submit() == null) {
+                    tvInfo[i][FILA].setText("Sem informações sobre a fila.");
+                    tvInfo[i][FILA].setTextColor(Color.BLACK);
+                } else {
+                    tvInfo[i][FILA].setText(Fila.CLASSIFICACAO[Util.restaurantes[i].getLineStatus()]);
+                    tvInfo[i][FILA].setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[i].getLineStatus()]));
+                }
             } else {
                 tvInfo[i][FILA].setText("");
             }
@@ -141,7 +146,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             showLineContentOnScreen();// mostrar na tela
                         } else {
                             // esconder info da fila
-                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Fila.", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     default:
