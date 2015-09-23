@@ -44,6 +44,8 @@ public abstract class GetJsonTask extends AsyncTask<String, String, String> {
         Util.setJson(getTaskId(), json);
         pDialog.dismiss();
         handler.sendEmptyMessage(getTaskId());
-        Toast.makeText(caller.getApplicationContext(), getFinishMessage(), Toast.LENGTH_SHORT).show();
+        if (json != null) {
+            Toast.makeText(caller.getApplicationContext(), getFinishMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

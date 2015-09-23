@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,17 +29,63 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public Handler jsonHandler;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("[MainActivity]onResume", "onResume called!");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("[MainActivity]onRestart", "onRestart called!");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[MainActivity]onPause", "onPause called!");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("[MainActivity]onDestroy", "onDestroy called!");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("[MainActivity]onStop", "onStop called!");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("[MainActivity]onStart", "onStart called!");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("[MainActivity]onCreate", "onCreate called!");
         setContentView(R.layout.activity_main);
         setTextViews();
         Util.setMainActivityInstance(this);
+        //hideEvaluateButton();
+        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+        btn_evaluate_line.setVisibility(View.VISIBLE);
+        btn_evaluate_line.setOnClickListener(this);
         setJsonHandler(); // aguarda pelo json e mostra na tela
         Util.setMenuStrings(this, jsonHandler);
         Util.setLineStrings(this, jsonHandler);
         Util.setCustomActionBar(this, jsonHandler);
     }
 
+
+    public void hideEvaluateButton() {
+        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+        btn_evaluate_line.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     public void onClick(View v) {
@@ -95,6 +142,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         /*if (Util.getPeriodToShowLine() != Periodo.NOTHING) {
             return;
         }*/
+        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+        btn_evaluate_line.setVisibility(View.VISIBLE);
+        btn_evaluate_line.setOnClickListener(this);
         for (int i = 0; i < 3; i++) {
             Cardapio meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
             if (meal != null) {
@@ -161,13 +211,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         BootstrapButton btn_central_more_details = (BootstrapButton) findViewById(R.id.activity_main_central_btn_more_details);
         BootstrapButton btn_quimica_more_details = (BootstrapButton) findViewById(R.id.activity_main_quimica_btn_more_details);
         BootstrapButton btn_fisica_more_details = (BootstrapButton) findViewById(R.id.activity_main_fisica_btn_more_details);
-        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
 
         btn_central_more_details.setOnClickListener(this);
         btn_quimica_more_details.setOnClickListener(this);
         btn_fisica_more_details.setOnClickListener(this);
-        btn_evaluate_line.setOnClickListener(this);
-
     }
 
     @Override

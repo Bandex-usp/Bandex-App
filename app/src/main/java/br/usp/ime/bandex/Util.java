@@ -70,7 +70,7 @@ public class Util {
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
         private static String horariosAlmocoStr[] = {"11:30:00", "14:15:00"};
-        private static String horariosJantarStr[] = {"17:30:00", "22:45:00"};
+        private static String horariosJantarStr[] = {"17:30:00", "19:45:00"};
         public static int INICIO = 0, FIM = 1;
         static {
             try {

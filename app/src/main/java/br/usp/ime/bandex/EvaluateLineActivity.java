@@ -33,12 +33,22 @@ public class EvaluateLineActivity extends ActionBarActivity {
     public int NOTHING = 3;
     public int chosenRestaurant = NOTHING;
     public int evaluation = 0; // Valores possíveis: 1 a 5
+    public static TextView tvRatingStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate_line);
         Util.setCustomActionBar(this, null);
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        tvRatingStatus = (TextView) findViewById(R.id.textViewTitleStatus);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                tvRatingStatus.setText(Util.Fila.CLASSIFICACAO[(int)(rating)-1]);
+                tvRatingStatus.setTextColor(getResources().getColor(Util.Fila.COR[(int)(rating)-1]));
+            }});
+
         BootstrapButton btn_send = (BootstrapButton) findViewById(R.id.activity_evaluate_line_btn_send);
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
