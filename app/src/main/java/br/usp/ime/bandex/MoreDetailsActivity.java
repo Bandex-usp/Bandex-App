@@ -39,6 +39,8 @@ public class MoreDetailsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_more_details);
+        LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
+        ll_fila.setVisibility(View.INVISIBLE);
         setJsonHandler();
         Util.setCustomActionBar(this, handler);
         currentPeriodOnScreen = Util.getPeriodToShowMenu();

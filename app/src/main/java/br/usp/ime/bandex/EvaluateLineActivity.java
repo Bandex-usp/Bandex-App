@@ -1,6 +1,7 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -43,10 +44,16 @@ public class EvaluateLineActivity extends ActionBarActivity {
         RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tvRatingStatus = (TextView) findViewById(R.id.textViewTitleStatus);
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
+
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                tvRatingStatus.setText(Util.Fila.CLASSIFICACAO[(int)(rating)-1]);
-                tvRatingStatus.setTextColor(getResources().getColor(Util.Fila.COR[(int)(rating)-1]));
+                if (rating > 0) {
+                    tvRatingStatus.setText(Util.Fila.CLASSIFICACAO[(int) (rating) - 1]);
+                    tvRatingStatus.setTextColor(getResources().getColor(Util.Fila.COR[(int) (rating) - 1]));
+                } else {
+                    tvRatingStatus.setText(getResources().getString(R.string.line_status_prompt));
+                    tvRatingStatus.setTextColor(Color.BLACK);
+                }
             }});
 
         BootstrapButton btn_send = (BootstrapButton) findViewById(R.id.activity_evaluate_line_btn_send);

@@ -15,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.Util.Fila;
@@ -27,6 +30,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public static final String EXTRA_RESTAURANTE = "EXTRA_RESTAURANTE";
     static TextView[][] tvInfo = new TextView[3][3]; // tvInfo[0][1] é a sobremesa do central
     public Handler jsonHandler;
+
+    public static GoogleAnalytics analytics;
+    public static Tracker tracker;
 
     @Override
     protected void onResume() {
@@ -67,6 +73,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-1"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+
         Log.d("[MainActivity]onCreate", "onCreate called!");
         setContentView(R.layout.activity_main);
         setTextViews();
@@ -101,15 +114,40 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         switch (v.getId()) {
             case central_details:
                 extra = Bandejao.CENTRAL;
+                tracker.setScreenName("MainActivity");
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("UX")
+                        .setAction("moreDetailsCen")
+                        .setLabel("evaluate")
+                        .build());
                 break;
             case quimica_details:
                 extra = Bandejao.QUIMICA;
+                tracker.setScreenName("MainActivity");
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("UX")
+                        .setAction("moreDetailsQui")
+                        .setLabel("evaluate")
+                        .build());
                 break;
             case fisica_details:
                 extra = Bandejao.FISICA;
+                tracker.setScreenName("MainActivity");
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("UX")
+                        .setAction("Mais Detalhes Física")
+                        .setLabel("moreDetailsFis")
+                        .build());
                 break;
             case evaluate_line:
                 clazz = EvaluateLineActivity.class;
+                // All subsequent hits will be send with screen name = "main screen"
+                tracker.setScreenName("MainActivity");
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("UX")
+                        .setAction("evaluateLine")
+                        .setLabel("evaluate")
+                        .build());
                 break;
             default:
                 changeActivity = false;

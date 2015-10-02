@@ -5,12 +5,19 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+
+
     <application
         android:allowBackup="true"
         android:logo="@mipmap/usp_logo"
         android:icon="@drawable/diningicon"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat.Light">
+        <!-- Add the following meta-data for devices running Google Play service.
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+            -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

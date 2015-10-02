@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/editText"
             android:text="@string/restaurant_prompt"
+            android:textColor="@color/black"
             android:textSize="20sp"/>
         <RadioGroup
             android:layout_width="wrap_content"
@@ -46,9 +47,6 @@
                 android:text="@string/title_quimica"
                 android:id="@+id/activity_evaluate_line_rb_quimica"
                 android:checked="false"
-                android:layout_below="@+id/activity_evaluate_line_rb_central"
-                android:layout_alignLeft="@+id/activity_evaluate_line_rb_central"
-                android:layout_alignStart="@+id/activity_evaluate_line_rb_central"
                 android:onClick="onRadioButtonClicked"
             />
 
@@ -58,9 +56,6 @@
                 android:text="@string/title_fisica"
                 android:id="@+id/activity_evaluate_line_rb_fisica"
                 android:checked="false"
-                android:layout_below="@+id/activity_evaluate_line_rb_quimica"
-                android:layout_alignLeft="@+id/activity_evaluate_line_rb_quimica"
-                android:layout_alignStart="@+id/activity_evaluate_line_rb_quimica"
                 android:onClick="onRadioButtonClicked"
             />
         </RadioGroup>
@@ -79,8 +74,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ratingBar"
-            android:layout_below="@+id/rg_radios"
-            android:layout_centerHorizontal="true"
             style="@style/pedestrianRatingBar"
             android:layout_marginTop="111dp"
             android:stepSize="1.0"
@@ -89,8 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTitleStatus"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"
             android:text="@string/line_status_prompt"
             android:textSize="20sp" />
 
@@ -106,8 +98,6 @@
             bootstrap:bb_size="large"
             bootstrap:bb_icon_right="fa-check-circle"
             bootstrap:bb_type="primary"
-            android:layout_below="@+id/ratingBar"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="46dp" />
 
     </LinearLayout>
