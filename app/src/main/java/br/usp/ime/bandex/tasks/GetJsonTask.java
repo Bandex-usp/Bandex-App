@@ -41,11 +41,13 @@ public abstract class GetJsonTask extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String json) {
         super.onPostExecute(json);
-        Util.setJson(getTaskId(), json);
         pDialog.dismiss();
-        handler.sendEmptyMessage(getTaskId());
+        Util.setJson(getTaskId(), json);
         if (json != null) {
             Toast.makeText(caller.getApplicationContext(), getFinishMessage(), Toast.LENGTH_SHORT).show();
+            handler.sendEmptyMessage(getTaskId());
+        } else {
+            Toast.makeText(caller.getApplicationContext(), "Ops! Não foi possível conectar ao servidor.", Toast.LENGTH_SHORT).show();
         }
     }
 }

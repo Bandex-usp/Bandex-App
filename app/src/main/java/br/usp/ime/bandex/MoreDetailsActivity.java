@@ -16,6 +16,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
@@ -32,12 +36,23 @@ public class MoreDetailsActivity extends ActionBarActivity {
     int currentDayOfWeekOnScreen;
     int currentPeriodOnScreen;
 
+    public static GoogleAnalytics analytics;
+    public static Tracker tracker;
+
     Spinner spinner1;
     LinearLayout ll_info_cardapio;
     public Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("MoreDetailsActivity");
+
         setContentView(R.layout.activity_more_details);
         LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
         ll_fila.setVisibility(View.INVISIBLE);
@@ -67,6 +82,11 @@ public class MoreDetailsActivity extends ActionBarActivity {
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Cardápio")
+                        .setAction("Visualizar por dia")
+                        .setLabel("Visualizar cardápio por dia - " + (getResources().getStringArray(R.array.days_array))[position])
+                        .build());
                 currentDayOfWeekOnScreen = position;
                 showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
                 showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
@@ -87,6 +107,11 @@ public class MoreDetailsActivity extends ActionBarActivity {
     }
 
     public void updateLineStatus(View view) {
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Fila")
+                .setAction("Atualizar Fila")
+                .setLabel("Atualizar Fila " + Bandejao.RESTAURANTES[currentRestaurantOnScreen])
+                .build());
         Util.getLineFromInternet(this, handler);
     }
 
@@ -132,10 +157,20 @@ public class MoreDetailsActivity extends ActionBarActivity {
             case R.id.activity_more_details_rb_almoco:
                 if (checked)
                     periodSelected = Periodo.LUNCH;
+                    tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Cardápio")
+                        .setAction("Visualizar por período")
+                        .setLabel("Visualizar cardápio por período - " + Periodo.LUNCH_DINNER_STR[periodSelected])
+                        .build());
                 break;
             case R.id.activity_more_details_rb_jantar:
                 if (checked)
                     periodSelected = Periodo.DINNER;
+                    tracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("Cardápio")
+                            .setAction("Visualizar por período")
+                            .setLabel("Visualizar cardápio por período - " + Periodo.LUNCH_DINNER_STR[periodSelected])
+                            .build());
                 break;
         }
         if (checked) {
@@ -144,15 +179,11 @@ public class MoreDetailsActivity extends ActionBarActivity {
         }
     }
 
-    public boolean isClosed(int restaurant_id, int day_of_week, int period) {
-        return Util.restaurantes[restaurant_id].getDays().get(day_of_week).getDay()[period] == null;
-    }
-
     public void showMenuContentOnScreen(int restaurant_id, int day_of_week, int period) {
         Bandex restaurant = Util.restaurantes[restaurant_id];
         TextView tv_entry_date = (TextView) findViewById(R.id.tv_entry_date);
         tv_entry_date.setText(restaurant.getDays().get(day_of_week).getEntry_DateS());
-        if (isClosed(restaurant_id, day_of_week, period)) {
+        if (Util.isClosed(restaurant_id, day_of_week, period)) {
             showClosed();
         } else {
             ll_info_cardapio.setVisibility(View.VISIBLE);
@@ -176,7 +207,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         if (Util.jsonLineRepresentation == null || Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 period != Util.getPeriodToShowLine() ||
                 day_of_week != Util.getDay_of_week() ||
-                isClosed(restaurant_id, day_of_week, period) || Util.restaurantes[restaurant_id].getLast_submit() == null) {
+                Util.isClosed(restaurant_id, day_of_week, period) || Util.restaurantes[restaurant_id].getLast_submit() == null) {
             ll_fila.setVisibility(View.INVISIBLE);
         } else {
             ll_fila.setVisibility(View.VISIBLE);
@@ -185,8 +216,8 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
             tv_line_status.setText(Fila.CLASSIFICACAO[Util.restaurantes[restaurant_id].getLineStatus()]);
             tv_line_status.setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[restaurant_id].getLineStatus()]));
-            ratingBar_line_status.setRating(1 + Util.restaurantes[restaurant_id].getLineStatus());
             ratingBar_line_status.setNumStars(1 + Util.restaurantes[restaurant_id].getLineStatus());
+            ratingBar_line_status.setRating(1 + Util.restaurantes[restaurant_id].getLineStatus());
             TextView tvLastSubmit = (TextView) findViewById(R.id.last_evaluation_time);
             tvLastSubmit.setText((new SimpleDateFormat("dd/MM/yyyy HH:mm")).format(Util.restaurantes[restaurant_id].getLast_submit()));
         }

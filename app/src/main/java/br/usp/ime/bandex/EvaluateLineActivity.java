@@ -16,6 +16,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.beardedhen.androidbootstrap.BootstrapButton;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,11 +38,21 @@ public class EvaluateLineActivity extends ActionBarActivity {
     public int chosenRestaurant = NOTHING;
     public int evaluation = 0; // Valores possíveis: 1 a 5
     public static TextView tvRatingStatus;
+    public static GoogleAnalytics analytics;
+    public static Tracker tracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_evaluate_line);
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("EvaluateLineActivity");
+
         Util.setCustomActionBar(this, null);
         RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tvRatingStatus = (TextView) findViewById(R.id.textViewTitleStatus);
@@ -82,6 +95,11 @@ public class EvaluateLineActivity extends ActionBarActivity {
             jsonObject.put("status", evaluation);
             jsonObject.put("submit_date", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()));
             (new PostJsonTask(this)).execute(jsonObject.toString(), getString(R.string.line_post_service_url));
+            tracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Fila")
+                    .setAction("Enviar avaliação")
+                    .setLabel("Enviar avaliação da fila - " + Bandejao.RESTAURANTES[chosenRestaurant])
+                    .build());
         } catch (JSONException e) {
             e.printStackTrace();
         }

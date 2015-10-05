@@ -19,6 +19,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import java.text.SimpleDateFormat;
+
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.Util.Fila;
 import br.usp.ime.bandex.Util.Periodo;
@@ -37,37 +39,37 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("[MainActivity]onResume", "onResume called!");
+        //Log.d("[MainActivity]onResume", "onResume called!");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.d("[MainActivity]onRestart", "onRestart called!");
+        //Log.d("[MainActivity]onRestart", "onRestart called!");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("[MainActivity]onPause", "onPause called!");
+        //Log.d("[MainActivity]onPause", "onPause called!");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("[MainActivity]onDestroy", "onDestroy called!");
+        //Log.d("[MainActivity]onDestroy", "onDestroy called!");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("[MainActivity]onStop", "onStop called!");
+        //Log.d("[MainActivity]onStop", "onStop called!");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("[MainActivity]onStart", "onStart called!");
+        //Log.d("[MainActivity]onStart", "onStart called!");
     }
 
     @Override
@@ -75,19 +77,28 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         analytics = GoogleAnalytics.getInstance(this);
         analytics.setLocalDispatchPeriod(1800);
-        tracker = analytics.newTracker("UA-68378292-1"); // Replace with actual tracker/property Id
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
         tracker.enableExceptionReporting(true);
         tracker.enableAdvertisingIdCollection(true);
         tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("MainActivity");
 
         Log.d("[MainActivity]onCreate", "onCreate called!");
         setContentView(R.layout.activity_main);
+        hideEvaluateButton();
         setTextViews();
         Util.setMainActivityInstance(this);
-        //hideEvaluateButton();
-        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
-        btn_evaluate_line.setVisibility(View.VISIBLE);
-        btn_evaluate_line.setOnClickListener(this);
+        if (Util.jsonLineRepresentation == null ||
+                Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                (Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                   Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                    Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
+            hideEvaluateButton();
+        } else {
+            BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+            btn_evaluate_line.setVisibility(View.VISIBLE);
+            btn_evaluate_line.setOnClickListener(this);
+        }
         setJsonHandler(); // aguarda pelo json e mostra na tela
         Util.setMenuStrings(this, jsonHandler);
         Util.setLineStrings(this, jsonHandler);
@@ -114,39 +125,35 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         switch (v.getId()) {
             case central_details:
                 extra = Bandejao.CENTRAL;
-                tracker.setScreenName("MainActivity");
                 tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("UX")
-                        .setAction("moreDetailsCen")
-                        .setLabel("evaluate")
+                        .setCategory("All")
+                        .setAction("Ir para mais detalhes")
+                        .setLabel("Ir para mais detalhes - Central")
                         .build());
                 break;
             case quimica_details:
                 extra = Bandejao.QUIMICA;
-                tracker.setScreenName("MainActivity");
                 tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("UX")
-                        .setAction("moreDetailsQui")
-                        .setLabel("evaluate")
+                        .setCategory("All")
+                        .setAction("Ir para mais detalhes")
+                        .setLabel("Ir para mais detalhes - Química")
                         .build());
                 break;
             case fisica_details:
                 extra = Bandejao.FISICA;
-                tracker.setScreenName("MainActivity");
                 tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("UX")
-                        .setAction("Mais Detalhes Física")
-                        .setLabel("moreDetailsFis")
+                        .setCategory("All")
+                        .setAction("Ir para mais detalhes")
+                        .setLabel("Ir para detalhes - Física")
                         .build());
                 break;
             case evaluate_line:
                 clazz = EvaluateLineActivity.class;
                 // All subsequent hits will be send with screen name = "main screen"
-                tracker.setScreenName("MainActivity");
                 tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("UX")
-                        .setAction("evaluateLine")
-                        .setLabel("evaluate")
+                        .setCategory("Fila")
+                        .setAction("Ir para avaliar Fila")
+                        .setLabel("Ir para avaliar Fila - Todos")
                         .build());
                 break;
             default:
@@ -221,9 +228,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         jsonHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                TextView tvGeneralInfo = (TextView) caller.findViewById(R.id.activity_main_tv_general_info);
                 switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
                     case Util.MENU_JSON_TASK_ID:
                         if (Util.jsonMenuToModel(caller)) {
+                            tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
+                                    " - " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS()
+                                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
                             showMenuContentOnScreen();
                         } else {
                             Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
@@ -232,9 +243,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     case Util.LINE_JSON_TASK_ID:
                         if (Util.jsonLineToModel(caller)) {
                             showLineContentOnScreen();// mostrar na tela
+                            tvGeneralInfo.setText("Exibindo informações sobre o " +
+                                    Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
+                                    " de hoje.");
                         } else {
                             // esconder info da fila
-
                             Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Fila.", Toast.LENGTH_SHORT).show();
                         }
                         break;

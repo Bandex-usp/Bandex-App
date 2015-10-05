@@ -20,6 +20,7 @@
         android:gravity="center"
         android:background="@color/fundo_site_usp">
         <TextView
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/editText"
@@ -27,6 +28,8 @@
             android:textColor="@color/black"
             android:textSize="20sp"/>
         <RadioGroup
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/rg_radios"
@@ -36,7 +39,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/title_central"
                 android:id="@+id/activity_evaluate_line_rb_central"
-                android:layout_marginTop="60dp"
                 android:checked="false"
                 android:onClick="onRadioButtonClicked"
             />
@@ -70,26 +72,29 @@
             android:numStars="5"
             android:stepSize="1"/-->
 
-        <RatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ratingBar"
-            style="@style/pedestrianRatingBar"
-            android:layout_marginTop="111dp"
-            android:stepSize="1.0"
-            />
         <TextView
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTitleStatus"
             android:textColor="@color/black"
+            android:gravity="bottom"
             android:text="@string/line_status_prompt"
             android:textSize="20sp" />
 
-
-
+        <RatingBar
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ratingBar"
+            style="@style/pedestrianRatingBar"
+            android:stepSize="1.0"
+            />
 
         <com.beardedhen.androidbootstrap.BootstrapButton
+            android:layout_weight="1"
             android:id="@+id/activity_evaluate_line_btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

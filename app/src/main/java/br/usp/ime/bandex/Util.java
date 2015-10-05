@@ -15,6 +15,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +52,8 @@ public class Util {
     public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
     public static Date entry_date = null;
+    public static GoogleAnalytics analytics;
+    public static Tracker tracker;
 
     public static class Fila {
         private static String ENORME = "Fila Enorme"; //5
@@ -63,13 +69,16 @@ public class Util {
 
     public static class Bandejao  {
         public static int CENTRAL = 0, QUIMICA = 1, FISICA = 2;
+        public static String[] RESTAURANTES = {"Central", "Química", "Física"};
     }
 
     public static class Periodo  {
         public static int LUNCH = 0, DINNER = 1, NOTHING = 2;
+        public static String []LUNCH_DINNER_STR = {"Almoço", "Jantar"};
+
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
-        private static String horariosAlmocoStr[] = {"11:30:00", "16:15:00"};
+        private static String horariosAlmocoStr[] = {"11:30:00", "14:15:00"};
         private static String horariosJantarStr[] = {"17:30:00", "19:45:00"};
         public static int INICIO = 0, FIM = 1;
         static {
@@ -113,16 +122,22 @@ public class Util {
                 break;
         }
 
-        String preferences_keys[] = {mainActivityInstance.getString(R.string.preferences_menu_cache),
-                mainActivityInstance.getString(R.string.preferences_line_cache)};
-        SharedPreferences sharedPref = mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(preferences_keys[taskID], value);
-        editor.apply();
+        if (jsonMenuRepresentation != null) {
+            String preferences_keys[] = {mainActivityInstance.getString(R.string.preferences_menu_cache),
+                    mainActivityInstance.getString(R.string.preferences_line_cache)};
+            SharedPreferences sharedPref = mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(preferences_keys[taskID], value);
+            editor.apply();
+        }
     }
 
     static void getLineFromInternet(Activity caller, Handler handler) {
-        if (getPeriodToShowLine() == Periodo.NOTHING) return;
+        if (Util.jsonLineRepresentation == null ||
+                Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                (Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                        Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
         ConnectivityManager connMgr = (ConnectivityManager)
                 caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -202,6 +217,7 @@ public class Util {
                     int days = (Calendar.SATURDAY - weekday + 1) % 7;
                     cal.add(Calendar.DAY_OF_YEAR, days);
                 }
+                cal.add(Calendar.DAY_OF_YEAR, 1);
                 entry_date = cal.getTime();
                 if (entry_date.before(atual)) {
                     jsonMenuRepresentation = null;
@@ -293,6 +309,10 @@ public class Util {
         Util.entry_date = entry_date;
     }
 
+    public static boolean isClosed(int restaurant_id, int day_of_week, int period) {
+        return Util.restaurantes[restaurant_id].getDays().get(day_of_week).getDay()[period] == null;
+    }
+
     public static boolean inRangeOfLunch() {
         Calendar now = Calendar.getInstance();
         if (Periodo.horarioAlmoco[Periodo.INICIO].before(now) &&
@@ -318,6 +338,13 @@ public class Util {
     }
 
     public static void setCustomActionBar(final ActionBarActivity context, final Handler handler) {
+        analytics = GoogleAnalytics.getInstance(context);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("AllScreens");
         android.support.v7.app.ActionBar mActionBar = context.getSupportActionBar();
         mActionBar.setDisplayShowHomeEnabled(false);
         mActionBar.setDisplayShowTitleEnabled(false);
@@ -336,6 +363,11 @@ public class Util {
             @Override
             public void onClick(View view) {
                 if (handler != null) {
+                    tracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("All")
+                            .setAction("Atualizar Tudo")
+                            .setLabel("Atualizar Tudo " + context.getTitle().toString())
+                            .build());
                     getMenuFromInternet(context, handler);
                     getLineFromInternet(context, handler);
                 }

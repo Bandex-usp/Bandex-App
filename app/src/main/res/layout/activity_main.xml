@@ -25,6 +25,13 @@
         android:background="@color/fundo_site_usp"
         android:id="@+id/activity_main_ll">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ops! Verifique sua conexão com a internet e atualize!"
+            android:id="@+id/activity_main_tv_general_info"
+            android:gravity="center_horizontal"/>
+
         <LinearLayout
             android:layout_weight="3"
             android:layout_gravity="center_horizontal"
@@ -33,7 +40,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:id="@+id/activity_main_ll_central">
             <TextView
                 android:id="@+id/activity_main_central_tv_title"
