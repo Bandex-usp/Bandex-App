@@ -113,6 +113,13 @@
                     android:text="@string/title_dessert"
                     android:id="@+id/activity_more_details_tv_desert"
                     android:layout_gravity="top|left" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/title_calories"
+                    android:id="@+id/activity_more_details_tv_calories"
+                    android:layout_gravity="top|left" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"

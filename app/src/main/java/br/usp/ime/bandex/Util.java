@@ -78,7 +78,7 @@ public class Util {
 
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
-        private static String horariosAlmocoStr[] = {"11:30:00", "14:15:00"};
+        private static String horariosAlmocoStr[] = {"11:00:00", "14:20:00"};
         private static String horariosJantarStr[] = {"17:30:00", "19:45:00"};
         public static int INICIO = 0, FIM = 1;
         static {
@@ -133,9 +133,8 @@ public class Util {
     }
 
     static void getLineFromInternet(Activity caller, Handler handler) {
-        if (Util.jsonLineRepresentation == null ||
-                Util.getPeriodToShowLine() == Periodo.NOTHING ||
-                (Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+        if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
                         Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
                         Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -246,6 +245,7 @@ public class Util {
             JSONArray jsonArrayBandexDays;
             String[] strings_lunch_dinner = {"lunch", "dinner"};
             String main, meat, second, salad, optional, desert;
+            int calories;
             restaurantes = new Bandex[3];
             for (int j = 0; j < 3; j++) { // Percorre array de restaurantes do json
                 jsonBandex = jsonMenu.getJSONObject(j);
@@ -264,7 +264,8 @@ public class Util {
                             salad = jsonMeal.getString("salad");
                             optional = jsonMeal.getString("optional");
                             desert = jsonMeal.getString("desert");
-                            cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert);
+                            calories = jsonMeal.getInt("calories");
+                            cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert, calories);
                         }
                     }
                     Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], mainActivityInstance);

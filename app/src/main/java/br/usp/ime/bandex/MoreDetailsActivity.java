@@ -193,12 +193,14 @@ public class MoreDetailsActivity extends ActionBarActivity {
             TextView tv_salad = (TextView) findViewById(R.id.activity_more_details_tv_salad);
             TextView tv_optional = (TextView) findViewById(R.id.activity_more_details_tv_optional);
             TextView tv_desert = (TextView) findViewById(R.id.activity_more_details_tv_desert);
+            TextView tv_calories = (TextView) findViewById(R.id.activity_more_details_tv_calories);
             tv_main.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMain());
             tv_meat.setText(restaurant.getDays().get(day_of_week).getDay()[period].getMeat());
             tv_second.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSecond());
             tv_salad.setText(restaurant.getDays().get(day_of_week).getDay()[period].getSalad());
             tv_optional.setText(restaurant.getDays().get(day_of_week).getDay()[period].getOptional().trim());
             tv_desert.setText(restaurant.getDays().get(day_of_week).getDay()[period].getDesert());
+            tv_calories.setText(restaurant.getDays().get(day_of_week).getDay()[period].getCalories());
         }
     }
 

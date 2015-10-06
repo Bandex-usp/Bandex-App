@@ -88,20 +88,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         hideEvaluateButton();
         setTextViews();
         Util.setMainActivityInstance(this);
+        setJsonHandler(); // aguarda pelo json e mostra na tela
+        Util.setMenuStrings(this, jsonHandler);
+        Util.setLineStrings(this, jsonHandler);
         if (Util.jsonLineRepresentation == null ||
                 Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 (Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                   Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                    Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
+                        Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
             hideEvaluateButton();
         } else {
             BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
             btn_evaluate_line.setVisibility(View.VISIBLE);
             btn_evaluate_line.setOnClickListener(this);
         }
-        setJsonHandler(); // aguarda pelo json e mostra na tela
-        Util.setMenuStrings(this, jsonHandler);
-        Util.setLineStrings(this, jsonHandler);
         Util.setCustomActionBar(this, jsonHandler);
     }
 
@@ -243,9 +243,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     case Util.LINE_JSON_TASK_ID:
                         if (Util.jsonLineToModel(caller)) {
                             showLineContentOnScreen();// mostrar na tela
-                            tvGeneralInfo.setText("Exibindo informações sobre o " +
-                                    Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
-                                    " de hoje.");
+                            tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
+                                    " - " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS()
+                                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
                         } else {
                             // esconder info da fila
                             Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Fila.", Toast.LENGTH_SHORT).show();

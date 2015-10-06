@@ -10,15 +10,17 @@ public class Cardapio {
     String salad;
     String optional;
     String desert;
+    int calories;
 
     public Cardapio(String main, String meat, String second, String salad, String optional,
-                    String desert) {
+                    String desert, int calories) {
         this.desert = desert;
         this.main = main;
         this.meat = meat;
         this.optional = optional;
         this.salad = salad;
         this.second = second;
+        this.calories = calories;
     }
 
     public String getMain() {
@@ -63,6 +65,10 @@ public class Cardapio {
 
     public String getDesert() {
         return desert;
+    }
+
+    public String getCalories() {
+        return "Valor Calórico: " + this.calories + " Kcal";
     }
 
     public void setDesert(String desert) {

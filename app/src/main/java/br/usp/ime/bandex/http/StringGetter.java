@@ -66,7 +66,7 @@ public class StringGetter {
             // Start name resolution
                 t.start();
                 // Sleep for as long as we are willing to wait for the DNS resolution
-                Thread.sleep(5000);
+                Thread.sleep(15000);
                 // If we slept the entire time without getting interrupted, the DNS resolution took too long
                 //  so assume we have no connectivity.
                 running.set(false); // We don't want to be interrupted anymore

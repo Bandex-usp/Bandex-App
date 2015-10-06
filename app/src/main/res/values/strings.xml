@@ -36,6 +36,7 @@
 
     <string name="title_main_dish">Principal</string>
     <string name="title_dessert">Sobremesa</string>
+    <string name="title_calories">Calorias</string>
     <string name="title_meat">Carne</string>
     <string name="title_side_dish">Acompanhamento</string>
     <string name="title_salad">Salada</string>
