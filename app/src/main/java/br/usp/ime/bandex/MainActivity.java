@@ -11,20 +11,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import java.text.SimpleDateFormat;
-
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.Util.Fila;
 import br.usp.ime.bandex.Util.Periodo;
-
 import br.usp.ime.bandex.model.Cardapio;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
@@ -37,42 +35,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public static Tracker tracker;
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //Log.d("[MainActivity]onResume", "onResume called!");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        //Log.d("[MainActivity]onRestart", "onRestart called!");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //Log.d("[MainActivity]onPause", "onPause called!");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //Log.d("[MainActivity]onDestroy", "onDestroy called!");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //Log.d("[MainActivity]onStop", "onStop called!");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //Log.d("[MainActivity]onStart", "onStart called!");
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         analytics = GoogleAnalytics.getInstance(this);
@@ -82,40 +44,60 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         tracker.enableAdvertisingIdCollection(true);
         tracker.enableAutoActivityTracking(true);
         tracker.setScreenName("MainActivity");
+        Log.d("[MainActivity]onResume", "onResume called!");
+    }
 
-        Log.d("[MainActivity]onCreate", "onCreate called!");
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("[MainActivity]onResume", "onResume called!");
         setContentView(R.layout.activity_main);
-        hideEvaluateButton();
         setTextViews();
         Util.setMainActivityInstance(this);
         setJsonHandler(); // aguarda pelo json e mostra na tela
         Util.setMenuStrings(this, jsonHandler);
         Util.setLineStrings(this, jsonHandler);
-        if (Util.jsonLineRepresentation == null ||
-                Util.getPeriodToShowLine() == Periodo.NOTHING ||
-                (Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
-            hideEvaluateButton();
-        } else {
-            BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
-            btn_evaluate_line.setVisibility(View.VISIBLE);
-            btn_evaluate_line.setOnClickListener(this);
-        }
+        Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
+        btn_evaluate_line.setVisibility(View.VISIBLE);
+        btn_evaluate_line.setOnClickListener(this);
         Util.setCustomActionBar(this, jsonHandler);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("[MainActivity]onRestart", "onRestart called!");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[MainActivity]onPause", "onPause called!");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("[MainActivity]onDestroy", "onDestroy called!");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("[MainActivity]onStop", "onStop called!");
     }
 
 
     public void hideEvaluateButton() {
-        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+        Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
         btn_evaluate_line.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onClick(View v) {
-        final int central_details = R.id.activity_main_central_btn_more_details;
-        final int quimica_details = R.id.activity_main_quimica_btn_more_details;
-        final int fisica_details = R.id.activity_main_fisica_btn_more_details;
+        final int central_details = R.id.activity_main_ll_central;
+        final int quimica_details = R.id.activity_main_ll_quimica;
+        final int fisica_details = R.id.activity_main_ll_fisica;
         final int evaluate_line = R.id.activity_main_btn_evaluate_line;
         Class clazz = MoreDetailsActivity.class;
         int extra = Bandejao.CENTRAL;
@@ -187,7 +169,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         /*if (Util.getPeriodToShowLine() != Periodo.NOTHING) {
             return;
         }*/
-        BootstrapButton btn_evaluate_line = (BootstrapButton) findViewById(R.id.activity_main_btn_evaluate_line);
+        Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
         btn_evaluate_line.setVisibility(View.VISIBLE);
         btn_evaluate_line.setOnClickListener(this);
         for (int i = 0; i < 3; i++) {
@@ -259,13 +241,30 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     public void setOnClickListeners() {
-        BootstrapButton btn_central_more_details = (BootstrapButton) findViewById(R.id.activity_main_central_btn_more_details);
-        BootstrapButton btn_quimica_more_details = (BootstrapButton) findViewById(R.id.activity_main_quimica_btn_more_details);
-        BootstrapButton btn_fisica_more_details = (BootstrapButton) findViewById(R.id.activity_main_fisica_btn_more_details);
+        LinearLayout btn_central_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_central);
+        LinearLayout btn_quimica_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_quimica);
+        LinearLayout btn_fisica_more_details =  (LinearLayout) findViewById(R.id.activity_main_ll_fisica);
 
         btn_central_more_details.setOnClickListener(this);
         btn_quimica_more_details.setOnClickListener(this);
         btn_fisica_more_details.setOnClickListener(this);
+        /*View.OnTouchListener touchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                        v.setBackgroundColor(Color.WHITE);
+                        break;
+                    case MotionEvent.ACTION_DOWN:
+                        v.setBackgroundColor(Color.LTGRAY);
+                        break;
+                }
+                return false;
+            }
+        };
+        btn_central_more_details.setOnTouchListener(touchListener);
+        btn_quimica_more_details.setOnTouchListener(touchListener);
+        btn_fisica_more_details.setOnTouchListener(touchListener);*/
     }
 
     @Override
@@ -274,21 +273,5 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
 }

@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/editText"
             android:text="@string/restaurant_prompt"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
             android:textSize="20sp"/>
         <RadioGroup
             android:layout_marginTop="10dp"
@@ -78,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textViewTitleStatus"
-            android:textColor="@color/black"
+            android:textColor="@android:color/black"
             android:gravity="bottom"
             android:text="@string/line_status_prompt"
             android:textSize="20sp" />
@@ -93,7 +93,13 @@
             android:stepSize="1.0"
             />
 
-        <com.beardedhen.androidbootstrap.BootstrapButton
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/activity_evaluate_line_btn_send"
+            android:text="@string/title_send"/>
+
+        <!--com.beardedhen.androidbootstrap.BootstrapButton
             android:layout_weight="1"
             android:id="@+id/activity_evaluate_line_btn_send"
             android:layout_width="wrap_content"
@@ -103,7 +109,7 @@
             bootstrap:bb_size="large"
             bootstrap:bb_icon_right="fa-check-circle"
             bootstrap:bb_type="primary"
-            android:layout_marginTop="46dp" />
+            android:layout_marginTop="46dp" /-->
 
     </LinearLayout>
 </ScrollView>

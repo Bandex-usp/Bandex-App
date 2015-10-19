@@ -1,22 +1,20 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:bootstrap="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/fundo_site_usp"
+    android:fillViewport="true"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity"
-    android:background="@color/fundo_site_usp"
-    android:fillViewport="true">
+    android:paddingBottom="@dimen/activity_vertical_margin">>
 
     <!-- ll_main -->
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        xmlns:bootstrap="http://schemas.android.com/apk/res-auto"
         tools:context=".MainActivity"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -30,19 +28,19 @@
             android:layout_height="wrap_content"
             android:text="Ops! Verifique sua conexão com a internet e atualize!"
             android:id="@+id/activity_main_tv_general_info"
-            android:gravity="center_horizontal"/>
-
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="5dp"/>
         <LinearLayout
-            android:layout_weight="3"
+            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:id="@+id/activity_main_ll_central">
+            android:id="@+id/activity_main_ll_central"
+            android:layout_marginBottom="5dp">
             <TextView
+                android:layout_marginTop="5dp"
                 android:id="@+id/activity_main_central_tv_title"
                 android:text="@string/title_central"
                 android:layout_gravity="center_horizontal"
@@ -51,12 +49,14 @@
                 android:textStyle="bold"/>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="5dp"
-                android:layout_marginTop="10dp" >
+                android:layout_marginTop="5dp" >
                 <LinearLayout
                     android:id="@+id/activity_main_ll_central_info"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
@@ -78,48 +78,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_central_info -->
-                <com.beardedhen.androidbootstrap.BootstrapButton
-                    android:id="@+id/activity_main_central_btn_more_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/title_more_details"
-                    android:layout_gravity="center_vertical"
-                    bootstrap:bb_size="small"
-                    bootstrap:bb_roundedCorners="true"
-                    bootstrap:bb_icon_right="fa-cloud"
-                    bootstrap:bb_type="success" /> <!-- activity_main_ll_central_more_detail -->
             </LinearLayout>
         </LinearLayout> <!-- ll_central -->
         <LinearLayout
-            android:layout_weight="3"
+            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangle"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:id="@+id/activity_main_ll_fisica">
+            android:background="@drawable/restaurante"
+            android:id="@+id/activity_main_ll_fisica"
+            android:layout_marginBottom="5dp">
             <TextView
+                android:layout_marginTop="5dp"
                 android:id="@+id/activity_main_fisica_tv_title"
                 android:text="@string/title_fisica"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="10dp" >
+
                 <LinearLayout
                     android:id="@+id/activity_main_ll_fisica_info"
-                    android:layout_weight="1"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
                     <TextView
                         android:id="@+id/activity_main_fisica_tv_mistura"
@@ -137,48 +122,35 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_fisica_info -->
-                <com.beardedhen.androidbootstrap.BootstrapButton
-                    android:id="@+id/activity_main_fisica_btn_more_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/title_more_details"
-                    android:layout_gravity="center_vertical"
-                    bootstrap:bb_size="small"
-                    bootstrap:bb_roundedCorners="true"
-                    bootstrap:bb_icon_right="fa-cloud"
-                    bootstrap:bb_type="success" /> <!-- activity_main_ll_fisica_more_detail -->
-            </LinearLayout>
+
+
         </LinearLayout> <!-- ll_fisica -->
+
         <LinearLayout
-            android:layout_weight="3"
+            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangle"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="10dp"
-            android:id="@+id/activity_main_ll_quimica">
+            android:background="@drawable/restaurante"
+            android:id="@+id/activity_main_ll_quimica"
+            android:layout_marginBottom="5dp">
             <TextView
+                android:layout_marginTop="5dp"
                 android:id="@+id/activity_main_quimica_tv_title"
                 android:text="@string/title_quimica"
                 android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="10dp" >
                 <LinearLayout
                     android:id="@+id/activity_main_ll_quimica_info"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
                     <TextView
                         android:id="@+id/activity_main_quimica_tv_mistura"
@@ -196,29 +168,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_quimica_info -->
-                <com.beardedhen.androidbootstrap.BootstrapButton
-                    android:id="@+id/activity_main_quimica_btn_more_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/title_more_details"
-                    android:layout_gravity="center_vertical"
-                    bootstrap:bb_size="small"
-                    bootstrap:bb_roundedCorners="true"
-                    bootstrap:bb_icon_right="fa-cloud"
-                    bootstrap:bb_type="success" /> <!-- activity_main_ll_quimica_more_detail -->
-            </LinearLayout>
         </LinearLayout> <!-- ll_quimica -->
-        <com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_weight="1"
-            android:id="@+id/activity_main_btn_evaluate_line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp"
+
+        <Button
             android:text="@string/title_evaluate_line"
-            bootstrap:bb_size="large"
-            bootstrap:bb_icon_right="fa-comment-o"
-            bootstrap:bb_type="primary" /> <!-- btn_evaluate_line -->
+            android:id="@+id/activity_main_btn_evaluate_line"
+            android:background="@drawable/button_more_details"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            style="@style/ButtonText">
+        </Button>
+
     </LinearLayout>
 </ScrollView>

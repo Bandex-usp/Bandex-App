@@ -20,6 +20,46 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rg_almoco_jantar"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginRight="15dp"
+                >
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_lunch"
+                    android:id="@+id/activity_more_details_rb_almoco"
+                    android:checked="false"
+                    android:onClick="onRadioButtonClicked"
+                    android:layout_gravity="left|bottom"/>
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_dinner"
+                    android:id="@+id/activity_more_details_rb_jantar"
+                    android:checked="false"
+                    android:layout_gravity="right|bottom"
+                    android:onClick="onRadioButtonClicked"/>
+            </RadioGroup>
+            <Spinner
+                android:id="@+id/days_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/days_array"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center|top"
             android:gravity="top"
@@ -35,8 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/title_current_date"
                 android:id="@+id/tv_entry_date"
-                android:layout_gravity="center"
-                android:layout_weight="1"/>
+                android:layout_gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -45,7 +84,7 @@
                 android:text="@string/title_bandex"
                 android:id="@+id/activity_more_details_tv_title_bandex"
                 android:layout_gravity="center|top"
-                android:layout_weight="1"/>
+                android:layout_marginBottom="5dp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -53,8 +92,7 @@
                 android:orientation="vertical"
                 android:layout_gravity="top|left"
                 android:gravity="bottom|left"
-                android:layout_marginLeft="15dp"
-                android:layout_weight="1">
+                android:layout_marginLeft="15dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -205,41 +243,6 @@
 
 
         </LinearLayout>
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/rg_almoco_jantar"
-            android:layout_gravity="center|bottom"
-            android:gravity="center|bottom"
-            android:orientation="horizontal"
-            android:layout_marginTop="15dp"
-            android:layout_weight="1">
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_lunch"
-                android:id="@+id/activity_more_details_rb_almoco"
-                android:checked="false"
-                android:onClick="onRadioButtonClicked"
-                android:layout_gravity="left|bottom"/>
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_dinner"
-                android:id="@+id/activity_more_details_rb_jantar"
-                android:checked="false"
-                android:layout_gravity="right|bottom"
-                android:onClick="onRadioButtonClicked"/>
-        </RadioGroup>
-        <Spinner
-            android:id="@+id/days_spinner"
-            android:layout_width="match_parent"
-            android:layout_margin="5dp"
-            android:layout_height="wrap_content"
-            android:entries="@array/days_array"
-            android:layout_weight="1"/>
-
     </LinearLayout>
 
 </ScrollView>

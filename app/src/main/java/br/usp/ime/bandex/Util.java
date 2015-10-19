@@ -47,7 +47,7 @@ public class Util {
     public static MainActivity mainActivityInstance;
     private static SharedPreferences sharedPreferences;
     public static String jsonMenuRepresentation;
-    public static String jsonLineRepresentation;
+    public static String jsonLineRepresentation = null;
     public static Bandex[] restaurantes;
     public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
@@ -147,8 +147,12 @@ public class Util {
         }
     }
 
-    public static void setLineStrings(Activity caller, Handler handler) {
-        getLineFromInternet(caller, handler);
+    public static void setLineStrings(MainActivity caller, Handler handler) {
+        if (jsonLineRepresentation == null) {
+            getLineFromInternet(caller, handler);
+        } else {
+            caller.jsonHandler.sendEmptyMessage(Util.LINE_JSON_TASK_ID);
+        }
     }
 
     public static boolean jsonLineToModel(Activity caller) {
