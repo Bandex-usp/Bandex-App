@@ -68,8 +68,7 @@
         <item name="android:shadowRadius">2</item>
     </style>
 
-
-
+    <string name="fa_chevron_right">&#xf054;</string>
     <string name="closedRestaurant">Restaurante Fechado.</string>
 
 

@@ -6,10 +6,10 @@
     tools:context=".MainActivity"
     android:background="@color/fundo_site_usp"
     android:fillViewport="true"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin">>
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
     <!-- ll_main -->
     <LinearLayout
@@ -55,9 +55,8 @@
                 android:layout_marginTop="5dp" >
                 <LinearLayout
                     android:id="@+id/activity_main_ll_central_info"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0.97"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
                     android:layout_width="0dp"
@@ -78,6 +77,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_central_info -->
+                <TextView
+                    android:layout_weight="0.03"
+                    android:textSize="20sp"
+                    android:id="@+id/arrow2"
+                    android:layout_gravity="center"
+                    android:text="@string/fa_chevron_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
             </LinearLayout>
         </LinearLayout> <!-- ll_central -->
         <LinearLayout
@@ -86,7 +94,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/restaurante"
+            android:background="@drawable/rectangle"
             android:id="@+id/activity_main_ll_fisica"
             android:layout_marginBottom="5dp">
             <TextView
@@ -97,14 +105,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"/>
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp" >
                 <LinearLayout
                     android:id="@+id/activity_main_ll_fisica_info"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0.97"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content" >
                     <TextView
                         android:id="@+id/activity_main_fisica_tv_mistura"
@@ -122,17 +135,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_fisica_info -->
+                <TextView
+                    android:layout_weight="0.03"
+                    android:textSize="20sp"
+                    android:id="@+id/arrow1"
+                    android:layout_gravity="center"
+                    android:text="@string/fa_chevron_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+        </LinearLayout>
 
 
         </LinearLayout> <!-- ll_fisica -->
 
         <LinearLayout
-            android:layout_weight="1"
+            android:layout_weight="0.97"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/restaurante"
+            android:background="@drawable/rectangle"
             android:id="@+id/activity_main_ll_quimica"
             android:layout_marginBottom="5dp">
             <TextView
@@ -143,14 +166,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp" >
                 <LinearLayout
                     android:id="@+id/activity_main_ll_quimica_info"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0.97"
                     android:layout_gravity="center_vertical"
                     android:orientation="vertical"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content" >
                     <TextView
                         android:id="@+id/activity_main_quimica_tv_mistura"
@@ -168,16 +196,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout> <!-- activity_main_ll_quimica_info -->
+                <TextView
+                    android:layout_weight="0.03"
+                    android:textSize="20sp"
+                    android:id="@+id/arrow3"
+                    android:layout_gravity="center"
+                    android:text="@string/fa_chevron_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
         </LinearLayout> <!-- ll_quimica -->
 
         <Button
             android:text="@string/title_evaluate_line"
             android:id="@+id/activity_main_btn_evaluate_line"
-            android:background="@drawable/button_more_details"
+            android:background="@drawable/botao"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal"
-            style="@style/ButtonText">
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:textAllCaps="false"
+            >
         </Button>
 
     </LinearLayout>

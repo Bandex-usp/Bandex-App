@@ -3,6 +3,7 @@ package br.usp.ime.bandex;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -52,6 +53,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onResume();
         Log.d("[MainActivity]onResume", "onResume called!");
         setContentView(R.layout.activity_main);
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
+        TextView button = (TextView)findViewById(R.id.arrow1);
+        button.setTypeface(font);
+        TextView button2 = (TextView)findViewById(R.id.arrow2);
+        button2.setTypeface(font);
+        TextView button3 = (TextView)findViewById(R.id.arrow3);
+        button3.setTypeface(font);
         setTextViews();
         Util.setMainActivityInstance(this);
         setJsonHandler(); // aguarda pelo json e mostra na tela

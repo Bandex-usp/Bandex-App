@@ -94,22 +94,19 @@
             />
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/activity_evaluate_line_btn_send"
-            android:text="@string/title_send"/>
-
-        <!--com.beardedhen.androidbootstrap.BootstrapButton
-            android:layout_weight="1"
-            android:id="@+id/activity_evaluate_line_btn_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:text="@string/title_send"
-            bootstrap:bb_size="large"
-            bootstrap:bb_icon_right="fa-check-circle"
-            bootstrap:bb_type="primary"
-            android:layout_marginTop="46dp" /-->
+            android:id="@+id/activity_evaluate_line_btn_send"
+            android:background="@drawable/botao"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:layout_marginTop="15dp"
+            android:textAllCaps="false"
+            >
+        </Button>
 
     </LinearLayout>
 </ScrollView>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="amarelo_usp">#fcb421</color>
+    <color name="amarelo_usp_dark">#CA901A</color>
     <color name="azul_claro_usp">#64c4d2</color>
     <color name="azul_escuro_usp">#1094ab</color>
     <color name="fundo_site_usp_old">#F2F1E6</color>
