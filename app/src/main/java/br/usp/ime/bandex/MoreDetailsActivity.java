@@ -69,7 +69,11 @@ public class MoreDetailsActivity extends ActionBarActivity {
                 currentRestaurantOnScreen = (int) extras.get((MainActivity.EXTRA_RESTAURANTE));
             }
         } else {
-            currentRestaurantOnScreen = (int)  savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
+            if (savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE) == null) {
+                currentRestaurantOnScreen = Bandejao.CENTRAL;
+            } else {
+                currentRestaurantOnScreen = (int)  savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
+            }
         }
         RadioButton rbSelected = Util.getPeriodToShowMenu() == Periodo.LUNCH ?
                 (RadioButton) findViewById(R.id.activity_more_details_rb_almoco) :
