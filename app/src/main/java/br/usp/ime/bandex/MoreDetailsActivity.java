@@ -184,6 +184,10 @@ public class MoreDetailsActivity extends ActionBarActivity {
     }
 
     public void showMenuContentOnScreen(int restaurant_id, int day_of_week, int period) {
+        if (Util.restaurantes == null) {
+            Util.setMenuStrings(this, handler);
+            return;
+        }
         Bandex restaurant = Util.restaurantes[restaurant_id];
         TextView tv_entry_date = (TextView) findViewById(R.id.tv_entry_date);
         tv_entry_date.setText(restaurant.getDays().get(day_of_week).getEntry_DateS());
