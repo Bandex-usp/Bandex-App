@@ -21,6 +21,10 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.Util.Fila;
 import br.usp.ime.bandex.Util.Periodo;
@@ -139,12 +143,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 break;
             case evaluate_line:
                 clazz = EvaluateLineActivity.class;
-                // All subsequent hits will be send with screen name = "main screen"
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("Fila")
-                        .setAction("Ir para avaliar Fila")
-                        .setLabel("Ir para avaliar Fila - Todos")
-                        .build());
+                if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                        (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                                Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                                Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
+                    changeActivity = false;
+                    Toast.makeText(this, "Ops! Avaliação disponível apenas nos horários de funcionamento do bandejão.", Toast.LENGTH_LONG).show();
+                } else {
+                    // All subsequent hits will be send with screen name = "main screen"
+                    tracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("Fila")
+                            .setAction("Ir para avaliar Fila")
+                            .setLabel("Ir para avaliar Fila - Todos")
+                            .build());
+                }
                 break;
             default:
                 changeActivity = false;
@@ -222,9 +234,31 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
                     case Util.MENU_JSON_TASK_ID:
                         if (Util.jsonMenuToModel(caller)) {
-                            tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
-                                    " - " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS()
-                                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
+                            // Verifica se está desatualizado
+                            String string_entry_date = Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS();
+                            Date entry_date = null;
+                            try {
+                                entry_date = new SimpleDateFormat("dd/MM/yyyy").parse(string_entry_date);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Calendar cal = Calendar.getInstance();
+                            Date atual = cal.getTime();
+                            cal.setTime(entry_date);
+                            int weekday = cal.get(Calendar.DAY_OF_WEEK);
+                            if (weekday != Calendar.SUNDAY) {
+                                int days = (Calendar.SATURDAY - weekday + 1) % 7;
+                                cal.add(Calendar.DAY_OF_YEAR, days);
+                            }
+                            cal.add(Calendar.DAY_OF_YEAR, 1);
+                            entry_date = cal.getTime();
+                            if (entry_date.before(atual)) {
+                                tvGeneralInfo.setText("O cardápio ainda não foi atualizado! Mostrando do dia " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS());
+                            } else {
+                                tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
+                                        " - " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS()
+                                        + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
+                            }
                             showMenuContentOnScreen();
                         } else {
                             Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
@@ -233,9 +267,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     case Util.LINE_JSON_TASK_ID:
                         if (Util.jsonLineToModel(caller)) {
                             showLineContentOnScreen();// mostrar na tela
-                            tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
+                            /*tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
                                     " - " + Util.restaurantes[0].getDays().get(Util.getDay_of_week()).getEntry_DateS()
-                                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
+                                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");*/
                         } else {
                             // esconder info da fila
                             Toast.makeText(getApplicationContext(), "Ops! Não foi possível pegar as informações de Fila.", Toast.LENGTH_SHORT).show();
@@ -256,23 +290,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         btn_central_more_details.setOnClickListener(this);
         btn_quimica_more_details.setOnClickListener(this);
         btn_fisica_more_details.setOnClickListener(this);
-        /*View.OnTouchListener touchListener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        v.setBackgroundColor(Color.WHITE);
-                        break;
-                    case MotionEvent.ACTION_DOWN:
-                        v.setBackgroundColor(Color.LTGRAY);
-                        break;
-                }
-                return false;
-            }
-        };
-        btn_central_more_details.setOnTouchListener(touchListener);
-        btn_quimica_more_details.setOnTouchListener(touchListener);
-        btn_fisica_more_details.setOnTouchListener(touchListener);*/
     }
 
     @Override

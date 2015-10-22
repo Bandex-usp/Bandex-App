@@ -215,18 +215,16 @@ public class Util {
                 Date atual = cal.getTime();
                 cal.setTime(entry_date);
                 int weekday = cal.get(Calendar.DAY_OF_WEEK);
-                if (weekday != Calendar.SUNDAY)
-                {
+                if (weekday != Calendar.SUNDAY) {
                     int days = (Calendar.SATURDAY - weekday + 1) % 7;
                     cal.add(Calendar.DAY_OF_YEAR, days);
                 }
                 cal.add(Calendar.DAY_OF_YEAR, 1);
                 entry_date = cal.getTime();
                 if (entry_date.before(atual)) {
-                    jsonMenuRepresentation = null;
+                    return false;
                     // fim Verifica se está desatualizado
-                }
-                else {
+                } else {
                     jsonMenuRepresentation = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_menu_cache), null);
                     Util.mainActivityInstance.jsonHandler.sendEmptyMessage(MENU_JSON_TASK_ID);
                 }
