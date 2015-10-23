@@ -16,7 +16,6 @@ import android.widget.RadioButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -54,7 +53,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
         tracker.enableAutoActivityTracking(true);
         tracker.setScreenName("EvaluateLineActivity");
 
-        Util.setCustomActionBar(this, null);
+        setCustomActionBar();
         RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tvRatingStatus = (TextView) findViewById(R.id.textViewTitleStatus);
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
@@ -135,5 +134,31 @@ public class EvaluateLineActivity extends ActionBarActivity {
         return true;
     }
 
+    public void setCustomActionBar() {
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("AllScreens");
+        android.support.v7.app.ActionBar mActionBar = this.getSupportActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
+        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
+        Typeface face= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Bold.ttf");
+        tvActionBar.setText(this.getTitle());
+        tvActionBar.setTypeface(face);
+
+        ImageButton imageButton = (ImageButton) mCustomView
+                .findViewById(R.id.imageButton);
+        imageButton.setVisibility(View.INVISIBLE);
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+        this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+    }
 
 }

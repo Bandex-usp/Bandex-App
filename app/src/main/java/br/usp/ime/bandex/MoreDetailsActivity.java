@@ -1,14 +1,22 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RatingBar;
@@ -22,12 +30,17 @@ import com.google.android.gms.analytics.Tracker;
 
 import org.w3c.dom.Text;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.Util.Periodo;
 import br.usp.ime.bandex.Util.Fila;
+import br.usp.ime.bandex.tasks.GetLineJsonTask;
+import br.usp.ime.bandex.tasks.GetMenuJsonTask;
 
 
 public class MoreDetailsActivity extends ActionBarActivity {
@@ -38,10 +51,10 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
     public static GoogleAnalytics analytics;
     public static Tracker tracker;
+    public Handler jsonHandler;
 
     Spinner spinner1;
     LinearLayout ll_info_cardapio;
-    public Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +70,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
         ll_fila.setVisibility(View.INVISIBLE);
         setJsonHandler();
-        Util.setCustomActionBar(this, handler);
+        setCustomActionBar();
         currentPeriodOnScreen = Util.getPeriodToShowMenu();
         currentDayOfWeekOnScreen = Util.getDay_of_week();
         ll_info_cardapio = (LinearLayout) findViewById(R.id.info_cardapio);
@@ -116,12 +129,35 @@ public class MoreDetailsActivity extends ActionBarActivity {
                 .setAction("Atualizar Fila")
                 .setLabel("Atualizar Fila " + Bandejao.RESTAURANTES[currentRestaurantOnScreen])
                 .build());
-        Util.getLineFromInternet(this, handler);
+        getLineFromInternet();
+    }
+
+    public void getLineFromInternet() {
+        if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                        Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
+                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
+        ConnectivityManager connMgr = (ConnectivityManager)
+                this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new GetLineJsonTask(this, jsonHandler).execute(this.getString(R.string.line_get_service_url));
+        } else {
+            Toast.makeText(this.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setLineStrings() {
+        if (Util.jsonLineRepresentation == null) {
+            getLineFromInternet();
+        } else {
+            jsonHandler.sendEmptyMessage(Util.LINE_JSON_TASK_ID);
+        }
     }
 
     private void setJsonHandler() {
         final Activity caller = this;
-        handler = new Handler() {
+        jsonHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) { // quem manda é o método que tenta pegar da cache ou da internet (este último só manda quando é pego com sucesso)
@@ -145,11 +181,6 @@ public class MoreDetailsActivity extends ActionBarActivity {
                 }
             }
         };
-    }
-
-    public void updateMenu() {
-        Util.getMenuFromInternet(this, handler);
-        Toast.makeText(this, "Cardápio atualizado!", Toast.LENGTH_SHORT).show();
     }
 
     public void onRadioButtonClicked(View view) {
@@ -183,9 +214,27 @@ public class MoreDetailsActivity extends ActionBarActivity {
         }
     }
 
+    public void setMenuStrings() {
+        if (!getMenuFromCache()) {
+            Log.d("setMenu", "Getting menu from internet");
+            getMenuFromInternet();
+        }
+    }
+
+    public void getMenuFromInternet() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new GetMenuJsonTask(this, jsonHandler).execute(this.getString(R.string.menu_service_url));
+        } else {
+            Toast.makeText(this.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void showMenuContentOnScreen(int restaurant_id, int day_of_week, int period) {
         if (Util.restaurantes == null) {
-            Util.setMenuStrings(this, handler);
+            setMenuStrings();
             return;
         }
         Bandex restaurant = Util.restaurantes[restaurant_id];
@@ -240,5 +289,77 @@ public class MoreDetailsActivity extends ActionBarActivity {
         return true;
     }
 
+    public void setCustomActionBar() {
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("AllScreens");
+        android.support.v7.app.ActionBar mActionBar = this.getSupportActionBar();
+        mActionBar.setDisplayShowHomeEnabled(false);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
+        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
+        Typeface face= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Bold.ttf");
+        tvActionBar.setText(this.getTitle());
+        tvActionBar.setTypeface(face);
+
+        ImageButton imageButton = (ImageButton) mCustomView
+                .findViewById(R.id.imageButton);
+        final ActionBarActivity me = this;
+        imageButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                    tracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("All")
+                            .setAction("Atualizar Tudo")
+                            .setLabel("Atualizar Tudo " + me.getTitle().toString())
+                            .build());
+                    getMenuFromInternet();
+                    getLineFromInternet();
+            }
+        });
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+        this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+    }
+
+    // Returns true if could get menu from cache successfully, false otherwise. Se conseguiu, ainda verifica se está desatualizado. Se estiver, retorna false.
+    public boolean getMenuFromCache() {
+        SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
+        String string_entry_date = sharedPreferences.getString(this.getString(R.string.preferences_entry_date_cache), null);
+        Date entry_date;
+        if (string_entry_date != null) { // já pegou da internet
+            try {
+                // Verifica se está desatualizado
+                entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(string_entry_date);
+                Calendar cal = Calendar.getInstance();
+                Date atual = cal.getTime();
+                cal.setTime(entry_date);
+                int weekday = cal.get(Calendar.DAY_OF_WEEK);
+                if (weekday != Calendar.SUNDAY) {
+                    int days = (Calendar.SATURDAY - weekday + 1) % 7;
+                    cal.add(Calendar.DAY_OF_YEAR, days);
+                }
+                cal.add(Calendar.DAY_OF_YEAR, 1);
+                entry_date = cal.getTime();
+                if (entry_date.before(atual)) {
+                    return false;
+                    // fim Verifica se está desatualizado
+                } else {
+                    Util.jsonMenuRepresentation = sharedPreferences.getString(this.getString(R.string.preferences_menu_cache), null);
+                    this.jsonHandler.sendEmptyMessage(Util.MENU_JSON_TASK_ID);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return Util.jsonMenuRepresentation != null;
+    }
 
 }

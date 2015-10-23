@@ -27,6 +27,15 @@
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
     <string name="line_post_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
     <string name="line_get_service_url">http://bandexweb.herokuapp.com/line_status.json</string>
+    <string name="text_new_functionality">Agora você pode ficar sabendo quando os bandejões estão fechados, seja por falta d\'água, manifestações, assembléia dos funcionários ou qualquer outro motivo.</string>
+
+    <string name="title_new_functionality">
+    Será que o bandejão vai estar fechado?
+    </string>
+
+    <string name="functionality_prompt">
+    Deseja habilitar estas notificações?
+    </string>
 
 
     <string name="title_updating_line">Atualizando a fila...</string>
@@ -92,6 +101,7 @@
 
     <color name="home_background_color">#EDEDED</color>
     <color name="white">#ffffff</color>
+    <string name="title_activity_new_functionality">Novidades</string>
 
 
 

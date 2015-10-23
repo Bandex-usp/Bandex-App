@@ -5,5 +5,7 @@
         <item name="android:minHeight">50dip</item>
         <item name="android:maxHeight">50dip</item>
     </style>
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

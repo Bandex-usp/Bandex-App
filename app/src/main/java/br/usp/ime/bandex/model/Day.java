@@ -1,5 +1,6 @@
 package br.usp.ime.bandex.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import java.text.DateFormat;
@@ -21,7 +22,6 @@ import br.usp.ime.bandex.Util;
 public class Day {
     Date entry_date;
     String entry_dateS; // string representation
-    int dayOfWeek;
     Cardapio lunch;
     Cardapio dinner;
     Cardapio[] day;
@@ -30,7 +30,7 @@ public class Day {
         return day;
     }
 
-    public Day(String data, Cardapio lunch, Cardapio dinner, MainActivity caller) {
+    public Day(String data, Cardapio lunch, Cardapio dinner, Activity caller) {
         day = new Cardapio[2];
         day[0] = lunch;
         day[1] = dinner;

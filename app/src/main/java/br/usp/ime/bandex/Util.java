@@ -44,16 +44,11 @@ public class Util {
 
     public static final int MENU_JSON_TASK_ID = 0;
     public static final int LINE_JSON_TASK_ID = 1;
-    public static MainActivity mainActivityInstance;
-    private static SharedPreferences sharedPreferences;
-    public static String jsonMenuRepresentation;
+    public static String jsonMenuRepresentation = null;
     public static String jsonLineRepresentation = null;
     public static Bandex[] restaurantes;
-    public static float[] currentLineStatus;
     public static String restaurantNames[] = {"Central", "Química", "Física"};
     public static Date entry_date = null;
-    public static GoogleAnalytics analytics;
-    public static Tracker tracker;
 
     public static class Fila {
         private static String ENORME = "Fila Enorme"; //5
@@ -99,18 +94,8 @@ public class Util {
         }
     }
 
-    public static void setMainActivityInstance(MainActivity instance) {
-        mainActivityInstance = instance;
-    }
 
-    public static void setMenuStrings(Activity caller, Handler handler) {
-        if (!getMenuFromCache()) {
-            Log.d("setMenu", "Getting menu from internet");
-            getMenuFromInternet(caller, handler);
-        }
-    }
-
-    public static void setJson(int taskID, String value) {
+    public static void setJson(int taskID, String value, Activity context) {
         switch (taskID) {
             case Util.LINE_JSON_TASK_ID:
                 jsonLineRepresentation = value;
@@ -123,35 +108,12 @@ public class Util {
         }
 
         if (jsonMenuRepresentation != null) {
-            String preferences_keys[] = {mainActivityInstance.getString(R.string.preferences_menu_cache),
-                    mainActivityInstance.getString(R.string.preferences_line_cache)};
-            SharedPreferences sharedPref = mainActivityInstance.getPreferences(Context.MODE_PRIVATE);
+            String preferences_keys[] = {context.getString(R.string.preferences_menu_cache),
+                    context.getString(R.string.preferences_line_cache)};
+            SharedPreferences sharedPref = context.getPreferences(Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(preferences_keys[taskID], value);
             editor.apply();
-        }
-    }
-
-    static void getLineFromInternet(Activity caller, Handler handler) {
-        if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
-                (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
-        ConnectivityManager connMgr = (ConnectivityManager)
-                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new GetLineJsonTask(caller, handler).execute(caller.getString(R.string.line_get_service_url));
-        } else {
-            Toast.makeText(caller.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public static void setLineStrings(MainActivity caller, Handler handler) {
-        if (jsonLineRepresentation == null) {
-            getLineFromInternet(caller, handler);
-        } else {
-            caller.jsonHandler.sendEmptyMessage(Util.LINE_JSON_TASK_ID);
         }
     }
 
@@ -202,38 +164,7 @@ public class Util {
         return true;
     }
 
-    // Returns true if could get menu from cache successfully, false otherwise. Se conseguiu, ainda verifica se está desatualizado. Se estiver, retorna false.
-    public static boolean getMenuFromCache() {
-        sharedPreferences = mainActivityInstance.getPreferences(Activity.MODE_PRIVATE);
-        String string_entry_date = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_entry_date_cache), null);
-        Date entry_date;
-        if (string_entry_date != null) { // já pegou da internet
-            try {
-                // Verifica se está desatualizado
-                entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(string_entry_date);
-                Calendar cal = Calendar.getInstance();
-                Date atual = cal.getTime();
-                cal.setTime(entry_date);
-                int weekday = cal.get(Calendar.DAY_OF_WEEK);
-                if (weekday != Calendar.SUNDAY) {
-                    int days = (Calendar.SATURDAY - weekday + 1) % 7;
-                    cal.add(Calendar.DAY_OF_YEAR, days);
-                }
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-                entry_date = cal.getTime();
-                if (entry_date.before(atual)) {
-                    return false;
-                    // fim Verifica se está desatualizado
-                } else {
-                    jsonMenuRepresentation = sharedPreferences.getString(mainActivityInstance.getString(R.string.preferences_menu_cache), null);
-                    Util.mainActivityInstance.jsonHandler.sendEmptyMessage(MENU_JSON_TASK_ID);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonMenuRepresentation != null;
-    }
+
 
     // Returns true if could pass json to model correctly and false otherwise
     public static boolean jsonMenuToModel(Activity caller) {
@@ -270,7 +201,7 @@ public class Util {
                             cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert, calories);
                         }
                     }
-                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], mainActivityInstance);
+                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], caller);
                     days.add(day);
                 } // Array de dias do json
                 restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
@@ -284,16 +215,6 @@ public class Util {
         return true;
     }
 
-    public static void getMenuFromInternet(Activity caller, Handler handler) {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new GetMenuJsonTask(caller, handler).execute(mainActivityInstance.getString(R.string.menu_service_url));
-        } else {
-            Toast.makeText(caller.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     static int getPeriodToShowMenu() {
         Calendar cal = Calendar.getInstance();
@@ -338,46 +259,5 @@ public class Util {
         } else if (inRangeOfDinner()) {
             return Periodo.DINNER;
         } else return Periodo.NOTHING;
-    }
-
-    public static void setCustomActionBar(final ActionBarActivity context, final Handler handler) {
-        analytics = GoogleAnalytics.getInstance(context);
-        analytics.setLocalDispatchPeriod(1800);
-        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
-        tracker.enableExceptionReporting(true);
-        tracker.enableAdvertisingIdCollection(true);
-        tracker.enableAutoActivityTracking(true);
-        tracker.setScreenName("AllScreens");
-        android.support.v7.app.ActionBar mActionBar = context.getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
-        LayoutInflater mInflater = LayoutInflater.from(context);
-
-        View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
-        TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
-        Typeface face= Typeface.createFromAsset(context.getAssets(), "fonts/Raleway-Bold.ttf");
-        tvActionBar.setText(context.getTitle());
-        tvActionBar.setTypeface(face);
-
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (handler != null) {
-                    tracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("All")
-                            .setAction("Atualizar Tudo")
-                            .setLabel("Atualizar Tudo " + context.getTitle().toString())
-                            .build());
-                    getMenuFromInternet(context, handler);
-                    getLineFromInternet(context, handler);
-                }
-            }
-        });
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        context.getSupportActionBar().setBackgroundDrawable(context.getResources().getDrawable(R.drawable.actionbar_background2));
     }
 }

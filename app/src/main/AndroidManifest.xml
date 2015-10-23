@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="br.usp.ime.bandex">
+    package="br.usp.ime.bandex" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
+    <!--
+      IMPORTANT: Change "com.parse.starter.permission.C2D_MESSAGE" in the lines below
+      to match your app's package name + ".permission.C2D_MESSAGE".
+    -->
+    <permission
+        android:name="br.usp.ime.bandex.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
 
+    <uses-permission android:name="br.usp.ime.bandex.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
-        android:logo="@mipmap/usp_logo"
         android:icon="@drawable/diningicon"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat.Light">
-        <!-- Add the following meta-data for devices running Google Play service.
+        android:logo="@mipmap/usp_logo"
+        android:theme="@style/Theme.AppCompat.Light" >
+
+        <!--
+        Add the following meta-data for devices running Google Play service.
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-            -->
+        -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize">
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,21 +48,55 @@
         </activity>
         <activity
             android:name=".MoreDetailsActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_more_details"
-            android:parentActivityName=".MainActivity"
-            android:configChanges="orientation|screenSize">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.usp.ime.bandex.MainActivity" />
         </activity>
         <activity
             android:name=".EvaluateLineActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_evaluate_line"
-            android:parentActivityName=".MainActivity"
-            android:configChanges="orientation|screenSize">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.usp.ime.bandex.MainActivity" />
+        </activity>
+
+
+        <service android:name="com.parse.PushService" />
+
+        <receiver
+            android:name=".ParseReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+<!--                   IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
+                <category android:name="br.usp.ime.bandex" />
+            </intent-filter>
+        </receiver>
+
+        <meta-data
+            android:name="com.parse.push.notification_icon"
+            android:resource="@drawable/diningicon114" />
+
+        <activity
+            android:name=".NewFunctionalityActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_new_functionality">
         </activity>
     </application>
 

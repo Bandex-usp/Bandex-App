@@ -7,6 +7,8 @@
     <color name="fundo_site_usp_old">#F2F1E6</color>
     <color name="fundo_site_usp">#EEEEEE</color>
 
+    <color name="dark_gray">#828282</color>
+    <color name="darker_gray">#666666</color>
     <color name="blue">#0000FF</color>
     <color name="green">#008000</color>
     <color name="yellow">#fcb421</color>

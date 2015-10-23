@@ -18,7 +18,7 @@ public class GetLineJsonTask extends GetJsonTask {
 
     @Override
     public String getUpdateMessage() {
-        return Util.mainActivityInstance.getString(R.string.title_updating_line);
+        return caller.getString(R.string.title_updating_line);
     }
 
     @Override
