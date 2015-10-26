@@ -3,6 +3,7 @@ package br.usp.ime.bandex;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
@@ -28,6 +29,13 @@ public class NewFunctionalityActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("NewFunctionalityActivity");
         setContentView(R.layout.activity_new_functionality);
         setCustomActionBar();
         Button butonNo = (Button) findViewById(R.id.no);
@@ -38,6 +46,11 @@ public class NewFunctionalityActivity extends ActionBarActivity {
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("alreadyAnsweredPushNotifications", true);
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Push Notifications")
+                        .setAction("Desabilitar Notificações")
+                        .setLabel("Desabilitar Notificações")
+                        .build());
                 editor.commit();
                 finish();
             }
@@ -47,19 +60,18 @@ public class NewFunctionalityActivity extends ActionBarActivity {
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("alreadyAnsweredPushNotifications", true);
+                editor.putBoolean("enableNotifications", true);
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Push Notifications")
+                        .setAction("Desabilitar Notificações")
+                        .setLabel("Desabilitar Notificações")
+                        .build());
                 editor.commit();
                 finish();
             }
         });
     }
     public void setCustomActionBar() {
-        analytics = GoogleAnalytics.getInstance(this);
-        analytics.setLocalDispatchPeriod(1800);
-        tracker = analytics.newTracker("UA-68378292-2"); // Replace with actual tracker/property Id
-        tracker.enableExceptionReporting(true);
-        tracker.enableAdvertisingIdCollection(true);
-        tracker.enableAutoActivityTracking(true);
-        tracker.setScreenName("AllScreens");
         android.support.v7.app.ActionBar mActionBar = this.getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false);
         LayoutInflater mInflater = LayoutInflater.from(this);
@@ -74,5 +86,4 @@ public class NewFunctionalityActivity extends ActionBarActivity {
         mActionBar.setDisplayShowCustomEnabled(true);
         this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
     }
-
 }

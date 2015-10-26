@@ -110,7 +110,7 @@ public class Util {
         if (jsonMenuRepresentation != null) {
             String preferences_keys[] = {context.getString(R.string.preferences_menu_cache),
                     context.getString(R.string.preferences_line_cache)};
-            SharedPreferences sharedPref = context.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences sharedPref = context.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(preferences_keys[taskID], value);
             editor.apply();
@@ -151,13 +151,13 @@ public class Util {
                 }
                 Date submit_date = null;
                 try {
-                    submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(submit_dateStr);
+                        submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(submit_dateStr);
                 } catch (ParseException e) {
                     status = 0;
                     submit_date = null;
                     e.printStackTrace();
                 }
-            if (status > 4) status = 4;
+                if (status > 4) status = 4;
                 restaurantes[j].setLineStatus(status);
                 restaurantes[j].setLast_submit(submit_date);
             }

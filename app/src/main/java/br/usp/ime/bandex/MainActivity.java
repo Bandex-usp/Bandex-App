@@ -53,6 +53,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("[MainActivity]onCreate", "onCreate called!");
         setJsonHandler(); // aguarda pelo json e mostra na tela
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
         boolean goodNews = sharedPreferences.getBoolean("alreadyAnsweredPushNotifications", false);
@@ -70,15 +71,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         tracker.enableAdvertisingIdCollection(true);
         tracker.enableAutoActivityTracking(true);
         tracker.setScreenName("MainActivity");
-        Log.d("[MainActivity]onCreate", "onCreate called!");
-        //Parse.initialize(this, "5umFg7qGHN5EC2Xf2zfsF0ItLohWt9DZYFuyvwtO", "HAyxaPMWjBhqShnrmQAQJR17Fev41cp6I8NcJo4a");
-    }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("[MainActivity]onResume", "onResume called!");
         setContentView(R.layout.activity_main);
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
         TextView button = (TextView)findViewById(R.id.arrow1);
@@ -92,6 +85,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         btn_evaluate_line.setVisibility(View.VISIBLE);
         btn_evaluate_line.setOnClickListener(this);
         setCustomActionBar();
+        //Parse.initialize(this, "5umFg7qGHN5EC2Xf2zfsF0ItLohWt9DZYFuyvwtO", "HAyxaPMWjBhqShnrmQAQJR17Fev41cp6I8NcJo4a");
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("[MainActivity]onResume", "onResume called!");
         Log.d("[MainActivity]onResume", "onResume to the end!");
     }
 
@@ -115,8 +116,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     // Returns true if could get menu from cache successfully, false otherwise. Se conseguiu, ainda verifica se está desatualizado. Se estiver, retorna false.
     public boolean getMenuFromCache() {
-        SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
-        String string_entry_date = sharedPreferences.getString(this.getString(R.string.preferences_entry_date_cache), null);
+        SharedPreferences sharedPreferences = this.getSharedPreferences("cardapio", Activity.MODE_PRIVATE);
+                String string_entry_date = sharedPreferences.getString(this.getString(R.string.preferences_entry_date_cache), null);
         Date entry_date;
         if (string_entry_date != null) { // já pegou da internet
             try {
@@ -279,6 +280,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Cardapio meal;
         int MISTURA = 0, SOBREMESA = 1;
 
+        if (Util.restaurantes == null) {
+            setMenuStrings();
+            return;
+        }
+
         for (int i = 0; i < 3; i++) { // Para cada restaurante, mostra a carne e a sobremesa
             meal = Util.restaurantes[i].getDays().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
             if (meal != null) {
@@ -412,7 +418,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
                         Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
+                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) {
+            Log.d("getLineFromInternet", "Fora do horário");
+            return;
+        }
         ConnectivityManager connMgr = (ConnectivityManager)
                 this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();

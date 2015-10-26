@@ -27,7 +27,7 @@
     <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
     <string name="line_post_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
     <string name="line_get_service_url">http://bandexweb.herokuapp.com/line_status.json</string>
-    <string name="text_new_functionality">Agora você pode ficar sabendo quando os bandejões estão fechados, seja por falta d\'água, manifestações, assembléia dos funcionários ou qualquer outro motivo.</string>
+    <string name="text_new_functionality">Agora você pode ficar sabendo quando os bandejões estarão fechados por motivos excepcionais, como falta d\'água ou paralisação dos funcionários.</string>
 
     <string name="title_new_functionality">
     Será que o bandejão vai estar fechado?
@@ -86,7 +86,7 @@
     <string name="preferences_entry_date_cache">entry_date</string>
     <string name="title_activity_more_details">Mais detalhes</string>
 
-    <string name="title_activity_evaluate_line">Avaliação da Fila</string>
+    <string name="title_activity_evaluate_line">Avaliar Fila</string>
     <string name="title_bandex">Bandejão</string>
     <string-array name="days_array">
         <item>Segunda</item>

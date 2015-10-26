@@ -136,7 +136,8 @@ public class MoreDetailsActivity extends ActionBarActivity {
         if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 (Util.restaurantes != null && Util.isClosed(0, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
                         Util.isClosed(1, Util.getDay_of_week(), Util.getPeriodToShowMenu()) &&
-                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu()))) return;
+                        Util.isClosed(2, Util.getDay_of_week(), Util.getPeriodToShowMenu())))
+            return;
         ConnectivityManager connMgr = (ConnectivityManager)
                 this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -209,6 +210,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
                 break;
         }
         if (checked) {
+            currentPeriodOnScreen = periodSelected;
             showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, periodSelected);
             showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, periodSelected);
         }
@@ -331,8 +333,8 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
     // Returns true if could get menu from cache successfully, false otherwise. Se conseguiu, ainda verifica se está desatualizado. Se estiver, retorna false.
     public boolean getMenuFromCache() {
-        SharedPreferences sharedPreferences = this.getPreferences(Activity.MODE_PRIVATE);
-        String string_entry_date = sharedPreferences.getString(this.getString(R.string.preferences_entry_date_cache), null);
+        SharedPreferences sharedPreferences = this.getSharedPreferences("cardapio", MODE_PRIVATE);
+                String string_entry_date = sharedPreferences.getString(this.getString(R.string.preferences_entry_date_cache), null);
         Date entry_date;
         if (string_entry_date != null) { // já pegou da internet
             try {

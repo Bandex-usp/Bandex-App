@@ -45,7 +45,7 @@ public class Day {
         Util.setEntry_date(entry_date);
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         entry_dateS = df.format(entry_date);
-        SharedPreferences sharedPref = caller.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = caller.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(caller.getString(R.string.preferences_entry_date_cache), data);
         editor.commit();

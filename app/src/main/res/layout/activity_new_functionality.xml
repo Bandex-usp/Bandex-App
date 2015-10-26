@@ -1,75 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_horizontal_margin"
-    android:background="@color/fundo_site_usp">
-
-    <TextView
-        android:layout_width="wrap_content"
+    android:fillViewport="true"
+    >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/title_new_functionality"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal" />
+        android:background="@color/fundo_site_usp"
+        android:padding="@dimen/activity_horizontal_margin">
 
-    <TextView
-        android:layout_marginTop="15dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/text_new_functionality"
-        android:id="@+id/textView2"
-        android:layout_gravity="center_horizontal" />
-
-    <ImageView
-        android:layout_marginTop="15dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/push_notification"/>
-
-    <TextView
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/functionality_prompt"
-        android:id="@+id/textView3"
-        android:layout_gravity="center_horizontal" />
-
-    <LinearLayout
-        android:layout_marginTop="15dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-        <Button
-            android:text="Não"
-            android:id="@+id/no"
-            android:background="@drawable/botao_dark"
-            android:layout_height="wrap_content"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:padding="15dp"
-            android:textAllCaps="false">
-        </Button>
-        <Button
-            android:layout_marginLeft="10dp"
-            android:text="Sim"
-            android:id="@+id/yes"
-            android:background="@drawable/botao"
             android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/title_new_functionality"
+            android:id="@+id/textView"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_marginTop="15dp"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/text_new_functionality"
+            android:id="@+id/textView2"
+            android:layout_gravity="center_horizontal" />
+
+        <ImageView
+            android:layout_margin="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
             android:layout_gravity="center_horizontal"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:padding="15dp"
-            android:textAllCaps="false">
-        </Button>
+            android:src="@drawable/push_notification"
+            android:adjustViewBounds="true"/>
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/functionality_prompt"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_marginTop="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <Button
+                android:text="Não"
+                android:id="@+id/no"
+                android:background="@drawable/botao_dark"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:padding="15dp"
+                android:textAllCaps="false">
+            </Button>
+            <Button
+                android:layout_marginLeft="10dp"
+                android:text="Sim"
+                android:id="@+id/yes"
+                android:background="@drawable/botao"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:padding="15dp"
+                android:textAllCaps="false">
+            </Button>
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</ScrollView>

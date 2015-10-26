@@ -3,9 +3,11 @@ package br.usp.ime.bandex;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import com.parse.ParsePushBroadcastReceiver;
 
@@ -33,5 +35,12 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
             notification.color = context.getResources().getColor(R.color.amarelo_usp);
         }
         return notification;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        SharedPreferences sharedPrefs = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+            if (sharedPrefs.getBoolean("enableNotifications", false))
+                super.onReceive(context, intent);
     }
 }
