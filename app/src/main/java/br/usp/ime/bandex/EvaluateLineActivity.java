@@ -1,6 +1,7 @@
 package br.usp.ime.bandex;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.provider.MediaStore;
@@ -24,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -56,7 +58,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
         setCustomActionBar();
         RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         tvRatingStatus = (TextView) findViewById(R.id.textViewTitleStatus);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
@@ -67,7 +69,8 @@ public class EvaluateLineActivity extends ActionBarActivity {
                     tvRatingStatus.setText(getResources().getString(R.string.line_status_prompt));
                     tvRatingStatus.setTextColor(Color.BLACK);
                 }
-            }});
+            }
+        });
 
         Button btn_send = (Button) findViewById(R.id.activity_evaluate_line_btn_send);
         btn_send.setOnClickListener(new View.OnClickListener() {
@@ -75,13 +78,35 @@ public class EvaluateLineActivity extends ActionBarActivity {
             public void onClick(View v) {
                 RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
                 evaluation = (int) ratingBar.getRating();
+                SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                String nextEvaluationTime = sharedPreferences.getString("nextEvaluationTime", null);
+                final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
+                int diferenca_em_minutos = 0;
+                if (nextEvaluationTime != null) {
+                    try {
+                        Date nextEvaluationTimeDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(nextEvaluationTime);
+                        Date now = Calendar.getInstance().getTime();
+                        if (now.before(nextEvaluationTimeDate)) {
+                            diferenca_em_minutos = (int) ((nextEvaluationTimeDate.getTime() - now.getTime())/ONE_MINUTE_IN_MILLIS + 1);
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (evaluation == 0) {
                     (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5!", Toast.LENGTH_SHORT)).show();
                 } else {
                     if (chosenRestaurant == NOTHING) {
                         (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
+                    } else if (diferenca_em_minutos > 0){
+                        (Toast.makeText(getApplicationContext(), String.format("Ops! Próxima avaliação disponível daqui a %d minuto(s)!", diferenca_em_minutos), Toast.LENGTH_LONG)).show();
                     } else {
-                        avaliar(evaluation-1, chosenRestaurant);
+                        Date nextEvaluationTimeDate = new Date();
+                        nextEvaluationTimeDate.setTime(nextEvaluationTimeDate.getTime() + (15 * ONE_MINUTE_IN_MILLIS));
+                        editor.putString("nextEvaluationTime", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(nextEvaluationTimeDate));
+                        editor.commit();
+                        avaliar(evaluation - 1, chosenRestaurant);
                     }
                 }
             }

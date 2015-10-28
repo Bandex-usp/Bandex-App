@@ -63,8 +63,8 @@ public class NewFunctionalityActivity extends ActionBarActivity {
                 editor.putBoolean("enableNotifications", true);
                 tracker.send(new HitBuilders.EventBuilder()
                         .setCategory("Push Notifications")
-                        .setAction("Desabilitar Notificações")
-                        .setLabel("Desabilitar Notificações")
+                        .setAction("Habilitar Notificações")
+                        .setLabel("Habilitar Notificações")
                         .build());
                 editor.commit();
                 finish();

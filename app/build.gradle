@@ -13,8 +13,8 @@ android {
         applicationId "br.usp.ime.bandex"
         minSdkVersion 11
         targetSdkVersion 22
-        versionCode 4
-        versionName "1.3"
+        versionCode 7
+        versionName "1.6"
     }
     buildTypes {
         release {
