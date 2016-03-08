@@ -3,21 +3,10 @@ package br.usp.ime.bandex;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,14 +14,15 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import br.usp.ime.bandex.model.Bandex;
-import br.usp.ime.bandex.model.Cardapio;
-import br.usp.ime.bandex.model.Day;
+import br.usp.ime.bandex.model.BandexFactory;
+import br.usp.ime.bandex.model.Central;
+import br.usp.ime.bandex.model.Fisica;
+import br.usp.ime.bandex.model.PCO;
+import br.usp.ime.bandex.model.Quimica;
 import br.usp.ime.bandex.tasks.GetLineJsonTask;
 import br.usp.ime.bandex.tasks.GetMenuJsonTask;
 
@@ -41,14 +31,20 @@ import br.usp.ime.bandex.tasks.GetMenuJsonTask;
  */
 public class Util {
 
-
+    public static final int NUMBER_OF_RESTAURANTS = 4;
     public static final int MENU_JSON_TASK_ID = 0;
     public static final int LINE_JSON_TASK_ID = 1;
-    public static String jsonMenuRepresentation = null;
-    public static String jsonLineRepresentation = null;
-    public static Bandex[] restaurantes;
-    public static String restaurantNames[] = {"Central", "Química", "Física"};
-    public static Date entry_date = null;
+
+    public static void setMenuDate(Date menuDate) {
+        Util.menuDate = menuDate;
+
+    }
+
+    public static Date menuDate = null;
+
+    public static String getFormattedMenuDate() {
+        return new SimpleDateFormat("dd/MM/yyyy").format(menuDate);
+    }
 
     public static class Fila {
         private static String ENORME = "Fila Enorme"; //5
@@ -63,7 +59,7 @@ public class Util {
     }
 
     public static class Bandejao  {
-        public static int CENTRAL = 0, QUIMICA = 1, FISICA = 2;
+        public static final int CENTRAL = 0, QUIMICA = 1, FISICA = 2, PCO = 3;
         public static String[] RESTAURANTES = {"Central", "Química", "Física"};
     }
 
@@ -95,29 +91,33 @@ public class Util {
     }
 
 
-    public static void setJson(int taskID, String value, Activity context) {
+    public static void setJson(int taskID, String json, Activity caller) {
         switch (taskID) {
             case Util.LINE_JSON_TASK_ID:
-                jsonLineRepresentation = value;
+                if (!jsonLineToModel(caller, json)) {
+                    Toast.makeText(caller, "Ops! Não foi possível pegar as informações sobre a fila.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Log.d("Debug setLineJson", "ok");
                 break;
             case Util.MENU_JSON_TASK_ID:
-                jsonMenuRepresentation = value;
+                if (!jsonMenuToModel(caller, json)) {
+                    Toast.makeText(caller, "Ops! Não foi possível pegar as informações de Cardápio.", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    SharedPreferences sharedPref = caller.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(caller.getString(R.string.preferences_menu_cache), json);
+                    editor.putString(caller.getString(R.string.preferences_entry_date_cache), getFormattedMenuDate());
+                    editor.apply();
+                }
                 Log.d("Debug setMenuJson", "ok");
                 break;
         }
 
-        if (jsonMenuRepresentation != null) {
-            String preferences_keys[] = {context.getString(R.string.preferences_menu_cache),
-                    context.getString(R.string.preferences_line_cache)};
-            SharedPreferences sharedPref = context.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(preferences_keys[taskID], value);
-            editor.apply();
-        }
     }
 
-    public static boolean jsonLineToModel(Activity caller) {
+    public static boolean jsonLineToModel(Activity caller, String jsonLineRepresentation) {
         JSONObject jsonLine = null;
         try {
             if (jsonLineRepresentation == null) {
@@ -129,83 +129,101 @@ public class Util {
             e.printStackTrace();
             return false;
         }
-        for (Integer j = 0; j < 3; j++) { // Percorre array de avaliações do json
-                JSONObject jsonRestaurant = null;
-                try {
-                    jsonRestaurant = jsonLine.getJSONObject(j.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-                int status = 0;
-                try {
-                    status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                String submit_dateStr = null;
-                try {
-                    submit_dateStr = jsonRestaurant.getString("last_submit");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Date submit_date = null;
-                try {
-                        submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(submit_dateStr);
-                } catch (ParseException e) {
-                    status = 0;
-                    submit_date = null;
-                    e.printStackTrace();
-                }
-                if (status > 4) status = 4;
-                restaurantes[j].setLineStatus(status);
-                restaurantes[j].setLast_submit(submit_date);
+        for (Integer j = 0; j < NUMBER_OF_RESTAURANTS; j++) { // Percorre array de avaliações do json
+            JSONObject jsonRestaurant = null;
+            try {
+                jsonRestaurant = jsonLine.getJSONObject(j.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
             }
+            int status = 0;
+            try {
+                status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String submit_dateStr = null;
+            try {
+                submit_dateStr = jsonRestaurant.getString("last_submit");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Date submit_date = null;
+            try {
+                submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(submit_dateStr);
+            } catch (ParseException e) {
+                status = 0;
+                submit_date = null;
+                e.printStackTrace();
+            }
+            if (status > 4) status = 4;
+            BandexFactory.getRestaurant(j).setLineStatus(status);
+            BandexFactory.getRestaurant(j).setLastSubmit(submit_date);
+        }
         return true;
     }
 
+    // Returns the json Representation of the menu or null on failure
+    public static String getMenuFromCache(Activity caller) {
+        SharedPreferences sharedPreferences = caller.getSharedPreferences("cardapio", Activity.MODE_PRIVATE);
+        String string_entry_date = sharedPreferences.getString(caller.getString(R.string.preferences_entry_date_cache), null);
+        if (string_entry_date != null) {
+            try {
+                setMenuDate(new SimpleDateFormat("dd/MM/yyyy").parse(string_entry_date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
+            if (Util.isMenuUpdated()) {
+                return sharedPreferences.getString(caller.getString(R.string.preferences_menu_cache), null);
+            }
+        }
+        return null;
+    }
+
+    public static void getMenuFromInternet(Activity caller) {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new GetMenuJsonTask(caller).execute(caller.getString(R.string.menu_service_url));
+        } else {
+            Toast.makeText(caller.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static void getLineFromInternet(Activity caller) {
+        if (!Util.canEvaluate()) {
+            Log.d("getLineFromInternet", "Fora do horário");
+            return;
+        }
+        ConnectivityManager connMgr = (ConnectivityManager)
+                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new GetLineJsonTask(caller).execute(caller.getString(R.string.line_get_service_url));
+        } else {
+            Toast.makeText(caller.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     // Returns true if could pass json to model correctly and false otherwise
-    public static boolean jsonMenuToModel(Activity caller) {
+    public static boolean jsonMenuToModel(Activity caller, String jsonMenuRepresentation) {
         try {
-            if (jsonMenuRepresentation == null) {
-                return false;
-            }
             JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
-            List<Day> days;
-            JSONObject jsonBandex;
-            JSONArray jsonArrayBandexDays;
-            String[] strings_lunch_dinner = {"lunch", "dinner"};
-            String main, meat, second, salad, optional, desert;
-            int calories;
-            restaurantes = new Bandex[3];
-            for (int j = 0; j < 3; j++) { // Percorre array de restaurantes do json
-                jsonBandex = jsonMenu.getJSONObject(j);
-                jsonArrayBandexDays = jsonBandex.getJSONArray("days");
-                days = new ArrayList<Day>();
-                for (int i = 0; i < jsonArrayBandexDays.length(); i++) { // percorre o array de dias do json
-                    JSONObject jsonDay = jsonArrayBandexDays.getJSONObject(i);
-                    Cardapio[] cardapios_lunch_dinner = {null, null};
-                    String data = jsonDay.getString("entry_date");
-                    for (int k = 0; k < 2; k++) { // Percorre lunch e dinner
-                        JSONObject jsonMeal = jsonDay.optJSONObject(strings_lunch_dinner[k]);
-                        if (jsonMeal != null) {
-                            main = jsonMeal.getString("main");
-                            meat = jsonMeal.getString("meat");
-                            second = jsonMeal.getString("second");
-                            salad = jsonMeal.getString("salad");
-                            optional = jsonMeal.getString("optional");
-                            desert = jsonMeal.getString("desert");
-                            calories = jsonMeal.getInt("calories");
-                            cardapios_lunch_dinner[k] = new Cardapio(main, meat, second, salad, optional, desert, calories);
-                        }
-                    }
-                    Day day = new Day(data, cardapios_lunch_dinner[0], cardapios_lunch_dinner[1], caller);
-                    days.add(day);
-                } // Array de dias do json
-                restaurantes[j] = new Bandex(jsonBandex.getInt("restaurant_id"), days);
-            } // array de restaurantes do json
+            Log.d("debugJson", jsonMenuRepresentation);
+            Central.initialize(jsonMenu.getJSONObject(Bandejao.CENTRAL));
+            Quimica.initialize(jsonMenu.getJSONObject(Bandejao.QUIMICA));
+            Fisica.initialize(jsonMenu.getJSONObject(Bandejao.FISICA));
+            PCO.initialize(jsonMenu.getJSONObject(Bandejao.PCO));
+            setMenuDate(PCO.getInstance().getDay(6).getDate());
+
+            if (caller instanceof MainActivity) {
+                ((MainActivity)caller).showMenuContentOnScreen();
+            } else {
+
+            }
         } catch (JSONException e) {
             Toast.makeText(caller, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
             Log.e("JsonParser", "Falha ao ler os atributos do json.");
@@ -214,7 +232,6 @@ public class Util {
         }
         return true;
     }
-
 
     static int getPeriodToShowMenu() {
         Calendar cal = Calendar.getInstance();
@@ -229,12 +246,30 @@ public class Util {
         return day_of_week;
     }
 
-    public static void setEntry_date(Date entry_date) {
-        Util.entry_date = entry_date;
+    public static boolean isClosed(int restaurantId, int dayOfWeek, int period) {
+        Bandex bandex = BandexFactory.getRestaurant(restaurantId);
+        return !(bandex.getDay(dayOfWeek).getMeal(period).isAvailable());
     }
 
-    public static boolean isClosed(int restaurant_id, int day_of_week, int period) {
-        return Util.restaurantes[restaurant_id].getDays().get(day_of_week).getDay()[period] == null;
+    private static boolean isClosed(int restaurantId) {
+        return isClosed(restaurantId, Util.getDay_of_week(), Util.getPeriodToShowLine());
+    }
+
+    public static boolean canEvaluate() {
+        return !(Util.getPeriodToShowLine() == Periodo.NOTHING ||
+                (Util.isClosed(Bandejao.CENTRAL) && Util.isClosed(Bandejao.FISICA)
+                        && Util.isClosed(Bandejao.QUIMICA) && Util.isClosed(Bandejao.PCO)));
+    }
+
+    // Verifica se está atualizado o cardápio
+    public static boolean isMenuUpdated() {
+        Date agora = Calendar.getInstance().getTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(menuDate);
+        cal.add(Calendar.DAY_OF_YEAR, 1); // fica um dia a mais... para saber se agora é <= data
+        Log.d("agora: ", agora.toString());
+        Log.d("data: ", cal.getTime().toString());
+        return agora.before(cal.getTime());
     }
 
     public static boolean inRangeOfLunch() {

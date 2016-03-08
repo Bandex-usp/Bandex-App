@@ -11,14 +11,17 @@ import br.usp.ime.bandex.http.StringGetter;
 
 /**
  * Created by Wagner on 09/05/2015.
-*/                                 //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
+ */                                 //<parametros doInBackground, Parametros OnProgressUpdate, retorno do doInBackground>
 public abstract class GetJsonTask extends AsyncTask<String, String, String> {
     private ProgressDialog pDialog;
+
     public abstract int getTaskId();
+
     public abstract String getUpdateMessage();
+
     public abstract String getFinishMessage();
+
     Activity caller;
-    Handler handler;
 
     @Override
     protected void onPreExecute() {
@@ -42,10 +45,9 @@ public abstract class GetJsonTask extends AsyncTask<String, String, String> {
     protected void onPostExecute(String json) {
         super.onPostExecute(json);
         pDialog.dismiss();
-        Util.setJson(getTaskId(), json, caller);
         if (json != null) {
+            Util.setJson(getTaskId(), json, caller);
             Toast.makeText(caller, getFinishMessage(), Toast.LENGTH_SHORT).show();
-            handler.sendEmptyMessage(getTaskId());
         } else {
             Toast.makeText(caller.getApplicationContext(), "Ops! Não foi possível conectar ao servidor.", Toast.LENGTH_SHORT).show();
         }

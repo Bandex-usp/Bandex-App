@@ -1,81 +1,54 @@
 package br.usp.ime.bandex.model;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import java.text.DateFormat;
-import android.text.style.TtsSpan;
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-import br.usp.ime.bandex.MainActivity;
-import br.usp.ime.bandex.R;
-import br.usp.ime.bandex.Util;
-
 /**
- * Created by Wagner on 08/05/2015.
+ * Created by Wagner on 26/02/2016.
  */
 public class Day {
-    Date entry_date;
-    String entry_dateS; // string representation
-    Cardapio lunch;
-    Cardapio dinner;
-    Cardapio[] day;
+    private Date date;
 
-    public Cardapio[] getDay() {
-        return day;
+    public String getDateName() {
+        return new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 
-    public Day(String data, Cardapio lunch, Cardapio dinner, Activity caller) {
-        day = new Cardapio[2];
-        day[0] = lunch;
-        day[1] = dinner;
+    public void setDateName(String dateName) {
+        this.dateName = dateName;
         try {
-            entry_date = new SimpleDateFormat("yyyy-MM-dd").parse(data);
+            this.date = new SimpleDateFormat("yyyy-MM-dd").parse(dateName);
         } catch (ParseException e) {
-            Log.e("parseData", "erro ao parsear");
             e.printStackTrace();
         }
-        this.lunch = lunch;
-        this.dinner = dinner;
-        Util.setEntry_date(entry_date);
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        entry_dateS = df.format(entry_date);
-        SharedPreferences sharedPref = caller.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(caller.getString(R.string.preferences_entry_date_cache), data);
-        editor.commit();
     }
 
-    public Cardapio getLunch() {
-        return lunch;
+    private String dateName;
+    private String dayOfWeek;
+    private Meal meals[];
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
     }
 
-    public void setLunch(Cardapio lunch) {
-        this.lunch = lunch;
+    public Day(Meal meals[]) {
+        this.meals = meals;
     }
 
-    public Cardapio getDinner() {
-        return dinner;
+
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
     }
 
-    public void setDinner(Cardapio dinner) {
-        this.dinner = dinner;
+    public Meal getMeal(int period) {
+        return meals[period];
     }
 
-    public Date getEntry_date() {
-        return (Date)entry_date.clone();
+    public Date getDate() {
+        return date;
     }
 
-    public String getEntry_DateS() {
-        return entry_dateS;
-    }
-
-    public void setEntry_date(Date entry_date) {
-        this.entry_date = (Date)entry_date.clone();
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

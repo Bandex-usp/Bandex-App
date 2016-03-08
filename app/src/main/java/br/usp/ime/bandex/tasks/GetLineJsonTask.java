@@ -11,9 +11,8 @@ import br.usp.ime.bandex.Util;
  */
 public class GetLineJsonTask extends GetJsonTask {
 
-    public GetLineJsonTask(Activity caller, Handler handler) {
+    public GetLineJsonTask(Activity caller) {
         this.caller = caller;
-        this.handler = handler;
     }
 
     @Override

@@ -11,9 +11,8 @@ import br.usp.ime.bandex.Util;
  */
 public class GetMenuJsonTask extends GetJsonTask {
 
-    public GetMenuJsonTask(Activity caller, Handler handler) {
+    public GetMenuJsonTask(Activity caller) {
         this.caller = caller;
-        this.handler = handler;
     }
 
     @Override
