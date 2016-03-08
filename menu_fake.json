@@ -451,11 +451,11 @@
             "lunch":{
                "id":523,
                "main":"Arroz/feijão/arroz integral",
-               "meat":"Carne em tiras à cigana",
+               "meat":"Bobó de frango",
                "second":"Chuchu com hortelã",
                "salad":"Salada de escarola",
                "optional":"Opção: PVT à cigana",
-               "desert":"Goiaba",
+               "desert":"Laranja",
                "calories":825,
                "raw":"Arroz/feijão/arroz integral\nCarne em tiras à cigana\nOpção: PVT à cigana\nChuchu com hortelã\nSalada de escarola\nGoiaba\nMinipão/refresco"
             }
