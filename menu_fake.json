@@ -444,17 +444,6 @@
                "desert":"Laranja",
                "calories":980,
                "raw":"Arroz/feijão preto/arroz integral\nLombo com molho ferrugem\nOpção: PVT com molho vinagrete\nFarofa de banana\nSalada de almeirão\nLaranja\nMinipão/refresco"
-            },
-            "dinner":{
-               "id":522,
-               "main":"Arroz/feijão preto/arroz integral",
-               "meat":"Frango com molho de requeijão",
-               "second":"Escarola refogada",
-               "salad":"Salada de pepino com tomate",
-               "optional":"Opção: Fricassé de PVT",
-               "desert":"PCOBarrinha de chocolate",
-               "calories":890,
-               "raw":"Arroz/feijão preto/arroz integral\nFrango com molho de requeijão\nOpção: Fricassé de PVT\nEscarola refogada\nSalada de pepino com tomate\nBarrinha de chocolate\nMinipão/refresco"
             }
          },
          {
@@ -469,17 +458,6 @@
                "desert":"Goiaba",
                "calories":825,
                "raw":"Arroz/feijão/arroz integral\nCarne em tiras à cigana\nOpção: PVT à cigana\nChuchu com hortelã\nSalada de escarola\nGoiaba\nMinipão/refresco"
-            },
-            "dinner":{
-               "id":524,
-               "main":"Arroz/feijão/arroz integral",
-               "meat":"Carne assada à moda CEN",
-               "second":"Nhoque ao sugo",
-               "salad":"Salada de rúcula",
-               "optional":"Opção: PVT com cogumelos",
-               "desert":"Kiwi",
-               "calories":1055,
-               "raw":"Arroz/feijão/arroz integral\nCarne assada à moda CEN\nOpção: PVT com cogumelos\nNhoque ao sugo\nSalada de rúcula\nKiwi\nMinipão/refresco"
             }
          },
          {
@@ -494,17 +472,6 @@
                "desert":"Maçã",
                "calories":775,
                "raw":"Arroz/feijão/arroz integral\nFilé de frango com molho cítrico\nOpção: PVT com moyashi\nPolenta com rúcula\nSalada de acelga\nMaçã\nMinipão/refresco\n"
-            },
-            "dinner":{
-               "id":526,
-               "main":"Arroz/feijão/arroz integral",
-               "meat":"Carne em cubos com molho russo",
-               "second":"Cenoura com alho poró",
-               "salad":"Salada de escarola",
-               "optional":"Opção: PVT com molho russo",
-               "desert":"Banana",
-               "calories":950,
-               "raw":"Arroz/feijão/arroz integral\nCarne em cubos com molho russo\nOpção: PVT com molho russo\nCenoura com alho poró\nSalada de escarola\nBanana\nMinipão/refresco"
             }
          },
          {
@@ -519,17 +486,6 @@
                "desert":"Torrone",
                "calories":950,
                "raw":"Arroz/feijão/arroz integral\nBife de caçarola\nOpção: PVT com ervilha\nQuibebe\nSalada de alface\nTorrone\nMinipão/refresco\n"
-            },
-            "dinner":{
-               "id":528,
-               "main":"Arroz/feijão/arroz integral",
-               "meat":"Filé de tilápia dourado",
-               "second":"Legumes mistos",
-               "salad":"Salada de almeirão",
-               "optional":"Opção: PVT com abobrinha",
-               "desert":"Goiaba",
-               "calories":825,
-               "raw":"Arroz/feijão/arroz integral\nFilé de tilápia dourado\nOpção: PVT com abobrinha\nLegumes mistos\nSalada de almeirão\nGoiaba\nMinipão/refresco"
             }
          },
          {
@@ -544,17 +500,6 @@
                "desert":"Banana",
                "calories":1225,
                "raw":"Arroz/feijão/arroz integral\nFrango assado\nOpção: PVT à primavera\nMacarrão ao alho e óleo\nSalada de repolho\nBanana\nMinipão/refresco"
-            },
-            "dinner":{
-               "id":530,
-               "main":"Arroz/feijão/arroz integral",
-               "meat":"Cupim com molho roti",
-               "second":"Purê de mandioquinha",
-               "salad":"Salada de alface americana",
-               "optional":"Opção: PVT à caipira",
-               "desert":"Gelatina",
-               "calories":1035,
-               "raw":"Arroz/feijão/arroz integral\nCupim com molho roti\nOpção: PVT à caipira\nPurê de mandioquinha\nSalada de alface americana\nGelatina\nMinipão/refresco"
             }
          },
          {
