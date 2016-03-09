@@ -2,9 +2,7 @@ package br.usp.ime.bandex;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -57,7 +55,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         ll_fila.setVisibility(View.INVISIBLE);
         setCustomActionBar();
         currentPeriodOnScreen = Util.getPeriodToShowMenu();
-        currentDayOfWeekOnScreen = Util.getDay_of_week();
+        currentDayOfWeekOnScreen = Util.getDayOfWeek();
         ll_info_cardapio = (LinearLayout) findViewById(R.id.info_cardapio);
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -81,7 +79,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         tv_bandex.setText(BandexFactory.getRestaurant(currentRestaurantOnScreen).getName());
 
         spinner1 = (Spinner) findViewById(R.id.days_spinner); // Escolhe dia da semana
-        spinner1.setSelection(Util.getDay_of_week());
+        spinner1.setSelection(Util.getDayOfWeek());
         spinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -97,8 +95,8 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                showLineContentOnScreen(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriodToShowMenu());
-                showMenuContentOnScreen(currentRestaurantOnScreen, Util.getDay_of_week(), Util.getPeriodToShowMenu());
+                showLineContentOnScreen(currentRestaurantOnScreen, Util.getDayOfWeek(), Util.getPeriodToShowMenu());
+                showMenuContentOnScreen(currentRestaurantOnScreen, Util.getDayOfWeek(), Util.getPeriodToShowMenu());
             }
         });
     }
@@ -185,8 +183,9 @@ public class MoreDetailsActivity extends ActionBarActivity {
         LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
         if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 period != Util.getPeriodToShowLine() ||
-                day_of_week != Util.getDay_of_week() ||
+                day_of_week != Util.getDayOfWeek() ||
                 Util.isClosed(restaurant_id, day_of_week, period)
+                || BandexFactory.getRestaurant(restaurant_id).getLastSubmit() == null
            ) {
             ll_fila.setVisibility(View.INVISIBLE);
         } else {

@@ -20,7 +20,6 @@ public abstract class Meal {
     public Meal(JSONObject jsonMeal) {
         if (jsonMeal == null) {
             setAvailable(false);
-            setMeat("Restaurante Fechado");
             return;
         }
         try {
@@ -42,57 +41,36 @@ public abstract class Meal {
         return main;
     }
 
-    public void setMain(String main) {
-        this.main = main;
-    }
 
     public String getMeat() {
         return meat;
     }
 
-    public void setMeat(String meat) {
-        this.meat = meat;
-    }
 
     public String getSecond() {
         return second;
     }
 
-    public void setSecond(String second) {
-        this.second = second;
-    }
 
     public String getSalad() {
         return salad;
     }
 
-    public void setSalad(String salad) {
-        this.salad = salad;
-    }
 
     public String getOptional() {
         return optional;
     }
 
-    public void setOptional(String optional) {
-        this.optional = optional;
-    }
 
     public String getDesert() {
         return desert;
     }
 
-    public void setDesert(String desert) {
-        this.desert = desert;
-    }
 
     public String getCalories() {
         return "" + calories + " kcal";
     }
 
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
 
     public String getRaw() {
         return raw;

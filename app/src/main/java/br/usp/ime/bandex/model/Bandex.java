@@ -15,13 +15,11 @@ public abstract class Bandex {
     private Day[] days;
     private int lineStatus;
     private Date lastSubmit;
-    private int id;
+
+    public abstract int getId();
 
     public String getFormattedLastSubmit() {
-        return new SimpleDateFormat("dd/MM/yyyy").format(lastSubmit);
-    }
-    public int getId() {
-        return id;
+        return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(lastSubmit);
     }
 
     public Bandex(JSONObject jsonBandex) {
@@ -44,10 +42,6 @@ public abstract class Bandex {
 
     public Day getDay(int dayOfWeek) {
         return days[dayOfWeek];
-    }
-
-    public void setDays(Day[] days) {
-        this.days = days;
     }
 
     public abstract String getName();

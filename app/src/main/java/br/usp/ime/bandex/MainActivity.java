@@ -2,6 +2,7 @@ package br.usp.ime.bandex;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -86,6 +87,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Log.d("debugJson", menu);
             Util.jsonMenuToModel(this, menu);
         }
+        Util.getLineFromInternet(this);
     }
 
     @Override
@@ -197,9 +199,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void setTextViews() {
         int MISTURA = 0, SOBREMESA = 1, FILA = 2;
         tvInfo[Bandejao.CENTRAL][MISTURA] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
-        if (tvInfo[Bandejao.CENTRAL][MISTURA] == null) {
-            Log.d("opa!!!", "ei");
-        }
         tvInfo[Bandejao.CENTRAL][SOBREMESA] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
         tvInfo[Bandejao.CENTRAL][FILA] = (TextView) findViewById(R.id.activity_main_central_tv_line);
         tvInfo[Bandejao.QUIMICA][MISTURA] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
@@ -215,35 +214,35 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public void showLineContentOnScreen() {
         int FILA = 2;
-        /*if (Util.getPeriodToShowLine() != Periodo.NOTHING) {
-            return;
-        }*/
         Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
         btn_evaluate_line.setVisibility(View.VISIBLE);
         btn_evaluate_line.setOnClickListener(this);
-        for (int i = 0; i < 3; i++) {
-            /*Cardapio meal = Util.restaurantes[i].getDias().get(Util.getDay_of_week()).getDay()[Util.getPeriodToShowMenu()];
-            if (meal != null) {
-                if (Util.restaurantes[i].getLastSubmit() == null) {
+        for (int i = 0; i < Util.NUMBER_OF_RESTAURANTS; i++) {
+            Bandex bandex = BandexFactory.getRestaurant(i);
+            Meal meal = bandex.getDay(Util.getDayOfWeek()).getMeal(Util.getPeriodToShowLine());
+            if (meal.isAvailable()) {
+                if (bandex.getLastSubmit() == null) {
                     tvInfo[i][FILA].setText("Sem informações sobre a fila.");
                     tvInfo[i][FILA].setTextColor(Color.BLACK);
                 } else {
-                    tvInfo[i][FILA].setText(Fila.CLASSIFICACAO[Util.restaurantes[i].getLineStatus()]);
-                    tvInfo[i][FILA].setTextColor(getResources().getColor(Fila.COR[Util.restaurantes[i].getLineStatus()]));
+                    tvInfo[i][FILA].setText(Util.Fila.CLASSIFICACAO[bandex.getLineStatus()]);
+                    tvInfo[i][FILA].setTextColor(getResources().getColor(Util.Fila.COR[bandex.getLineStatus()]));
                 }
             } else {
                 tvInfo[i][FILA].setText("");
-            }*/
+            }
         }
     }
 
     public void showInfoBox(Bandex bandex) {
         int MISTURA = 0, SOBREMESA = 1;
-        Meal meal = bandex.getDay(Util.getDay_of_week()).getMeal(Util.getPeriodToShowMenu());
-        Log.d("erroNull", meal.getName());
-        tvInfo[bandex.getId()][MISTURA].setText(meal.getMeat());
+        Meal meal = bandex.getDay(Util.getDayOfWeek()).getMeal(Util.getPeriodToShowMenu());
         if (meal.isAvailable()) {
+            tvInfo[bandex.getId()][MISTURA].setText(meal.getMeat());
             tvInfo[bandex.getId()][SOBREMESA].setText(meal.getDesert());
+        } else {
+            tvInfo[bandex.getId()][MISTURA].setText("Restaurante Fechado");
+            tvInfo[bandex.getId()][SOBREMESA].setText("");
         }
     }
 
@@ -260,8 +259,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         TextView tvGeneralInfo = (TextView) findViewById(R.id.activity_main_tv_general_info);
         if (Util.isMenuUpdated()) {
             tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
-                    " - " + BandexFactory.getRestaurant(0).getDay(Util.getDay_of_week()).getDateName()
-                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDay_of_week()] + ")");
+                    " - " + BandexFactory.getRestaurant(0).getDay(Util.getDayOfWeek()).getDateName()
+                    + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDayOfWeek()] + ")");
         } else {
             tvGeneralInfo.setText("O cardápio ainda não foi atualizado! Mostrando do dia " + Util.getFormattedMenuDate());
         }

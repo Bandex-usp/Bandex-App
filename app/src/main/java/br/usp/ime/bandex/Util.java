@@ -118,48 +118,32 @@ public class Util {
     }
 
     public static boolean jsonLineToModel(Activity caller, String jsonLineRepresentation) {
-        JSONObject jsonLine = null;
         try {
-            if (jsonLineRepresentation == null) {
-                Toast.makeText(caller.getApplicationContext(), "Ops! Não foi possível conectar ao servidor.", Toast.LENGTH_SHORT).show();
-                return false;
+            JSONObject jsonLine = new JSONObject(jsonLineRepresentation);
+            for (Integer j = 0; j < NUMBER_OF_RESTAURANTS-1; j++) { // Percorre array de avaliações do json
+                JSONObject jsonRestaurant = jsonLine.getJSONObject(j.toString());
+                int status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
+                Date submitDate = null;
+                try {
+                    submitDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(jsonRestaurant.getString("last_submit"));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (status > 4) status = 4;
+                BandexFactory.getRestaurant(j).setLineStatus(status);
+                BandexFactory.getRestaurant(j).setLastSubmit(submitDate);
             }
-            jsonLine = new JSONObject(jsonLineRepresentation);
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
         }
-        for (Integer j = 0; j < NUMBER_OF_RESTAURANTS; j++) { // Percorre array de avaliações do json
-            JSONObject jsonRestaurant = null;
-            try {
-                jsonRestaurant = jsonLine.getJSONObject(j.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return false;
+
+        if (getPeriodToShowLine() != Periodo.NOTHING) {
+            if (caller instanceof MainActivity) {
+                ((MainActivity) caller).showLineContentOnScreen();
+            } else {
+
             }
-            int status = 0;
-            try {
-                status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String submit_dateStr = null;
-            try {
-                submit_dateStr = jsonRestaurant.getString("last_submit");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            Date submit_date = null;
-            try {
-                submit_date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(submit_dateStr);
-            } catch (ParseException e) {
-                status = 0;
-                submit_date = null;
-                e.printStackTrace();
-            }
-            if (status > 4) status = 4;
-            BandexFactory.getRestaurant(j).setLineStatus(status);
-            BandexFactory.getRestaurant(j).setLastSubmit(submit_date);
         }
         return true;
     }
@@ -195,7 +179,6 @@ public class Util {
 
     public static void getLineFromInternet(Activity caller) {
         if (!Util.canEvaluate()) {
-            Log.d("getLineFromInternet", "Fora do horário");
             return;
         }
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -240,10 +223,9 @@ public class Util {
         else return Periodo.DINNER;
     }
 
-    static int getDay_of_week() {
+    static int getDayOfWeek() {
         Calendar cal = Calendar.getInstance();
-        int day_of_week = (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7; // Calendar.Monday == 2. In this code, Monday = 0.
-        return day_of_week;
+        return (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7; // Calendar.Monday == 2. In this code, Monday = 0.
     }
 
     public static boolean isClosed(int restaurantId, int dayOfWeek, int period) {
@@ -252,7 +234,7 @@ public class Util {
     }
 
     private static boolean isClosed(int restaurantId) {
-        return isClosed(restaurantId, Util.getDay_of_week(), Util.getPeriodToShowLine());
+        return isClosed(restaurantId, Util.getDayOfWeek(), Util.getPeriodToShowLine());
     }
 
     public static boolean canEvaluate() {
@@ -289,10 +271,11 @@ public class Util {
     }
 
     public static int getPeriodToShowLine() {
-        if (inRangeOfLunch()) {
+        return Periodo.LUNCH;
+        /*if (inRangeOfLunch()) {
             return Periodo.LUNCH;
         } else if (inRangeOfDinner()) {
             return Periodo.DINNER;
-        } else return Periodo.NOTHING;
+        } else return Periodo.NOTHING;*/
     }
 }
