@@ -28,7 +28,7 @@ import br.usp.ime.bandex.model.Meal;
 
 public class MoreDetailsActivity extends ActionBarActivity {
 
-    int currentRestaurantOnScreen;
+    Bandejao currentRestaurantOnScreen;
     int currentDayOfWeekOnScreen;
     int currentPeriodOnScreen;
 
@@ -62,13 +62,13 @@ public class MoreDetailsActivity extends ActionBarActivity {
             if(extras == null) {
                 currentRestaurantOnScreen = Bandejao.CENTRAL;
             } else {
-                currentRestaurantOnScreen = (int) extras.get((MainActivity.EXTRA_RESTAURANTE));
+                currentRestaurantOnScreen = (Bandejao) extras.get((MainActivity.EXTRA_RESTAURANTE));
             }
         } else {
             if (savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE) == null) {
                 currentRestaurantOnScreen = Bandejao.CENTRAL;
             } else {
-                currentRestaurantOnScreen = (int)  savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
+                currentRestaurantOnScreen = (Bandejao)  savedInstanceState.getSerializable(MainActivity.EXTRA_RESTAURANTE);
             }
         }
         RadioButton rbSelected = Util.getPeriodToShowMenu() == Periodo.LUNCH ?
@@ -111,7 +111,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
         tracker.send(new HitBuilders.EventBuilder()
                 .setCategory("Fila")
                 .setAction("Atualizar Fila")
-                .setLabel("Atualizar Fila " + Bandejao.RESTAURANTES[currentRestaurantOnScreen])
+                .setLabel("Atualizar Fila " + BandexFactory.getRestaurant(currentRestaurantOnScreen))
                 .build());
         Util.getLineFromInternet(this);
     }
@@ -126,10 +126,10 @@ public class MoreDetailsActivity extends ActionBarActivity {
                 if (checked)
                     periodSelected = Periodo.LUNCH;
                     tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("Cardápio")
-                        .setAction("Visualizar por período")
-                        .setLabel("Visualizar cardápio por período - " + Periodo.LUNCH_DINNER_STR[periodSelected])
-                        .build());
+                            .setCategory("Cardápio")
+                            .setAction("Visualizar por período")
+                            .setLabel("Visualizar cardápio por período - " + Util.Period.possibleValues()[periodSelected])
+                            .build());
                 break;
             case R.id.activity_more_details_rb_jantar:
                 if (checked)
@@ -137,7 +137,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
                     tracker.send(new HitBuilders.EventBuilder()
                             .setCategory("Cardápio")
                             .setAction("Visualizar por período")
-                            .setLabel("Visualizar cardápio por período - " + Periodo.LUNCH_DINNER_STR[periodSelected])
+                            .setLabel("Visualizar cardápio por período - " + Util.Period.values()[periodSelected])
                             .build());
                 break;
         }
@@ -148,15 +148,11 @@ public class MoreDetailsActivity extends ActionBarActivity {
         }
     }
 
-    public void showMenuContentOnScreen(int restaurant_id, int day_of_week, int period) {
-        /*if (Util.restaurantes == null) {
-            setMenuStrings();
-            return;
-        }*/
-        Bandex restaurant = BandexFactory.getRestaurant(restaurant_id);
+    public void showMenuContentOnScreen(Bandejao bandejao, int day_of_week, int period) {
+        Bandex restaurant = BandexFactory.getRestaurant(bandejao);
         TextView tv_entry_date = (TextView) findViewById(R.id.tv_entry_date);
         tv_entry_date.setText(restaurant.getDay(day_of_week).getDateName());
-        if (Util.isClosed(restaurant_id, day_of_week, period)) {
+        if (Util.isClosed(bandejao, day_of_week, period)) {
             showClosed();
         } else {
             ll_info_cardapio.setVisibility(View.VISIBLE);
@@ -179,27 +175,27 @@ public class MoreDetailsActivity extends ActionBarActivity {
         }
     }
 
-    public void showLineContentOnScreen(int restaurant_id, int day_of_week, int period) {
+    public void showLineContentOnScreen(Bandejao bandejao, int day_of_week, int period) {
         LinearLayout ll_fila = (LinearLayout) findViewById(R.id.fila_more_details);
         if (Util.getPeriodToShowLine() == Periodo.NOTHING ||
                 period != Util.getPeriodToShowLine() ||
                 day_of_week != Util.getDayOfWeek() ||
-                Util.isClosed(restaurant_id, day_of_week, period)
-                || BandexFactory.getRestaurant(restaurant_id).getLastSubmit() == null
+                Util.isClosed(bandejao, day_of_week, period)
+                || BandexFactory.getRestaurant(bandejao).getLastSubmit() == null
            ) {
             ll_fila.setVisibility(View.INVISIBLE);
         } else {
             ll_fila.setVisibility(View.VISIBLE);
             TextView tv_line_status = (TextView) findViewById(R.id.activity_more_details_tv_line_evaluation_category);
             RatingBar ratingBar_line_status = (RatingBar) findViewById(R.id.ratingBar2);
-            int lineStatus = BandexFactory.getRestaurant(restaurant_id).getLineStatus();
+            int lineStatus = BandexFactory.getRestaurant(bandejao).getLineStatus();
 
             tv_line_status.setText(Fila.CLASSIFICACAO[lineStatus]);
             tv_line_status.setTextColor(getResources().getColor(Fila.COR[lineStatus]));
             ratingBar_line_status.setNumStars(1 + lineStatus);
             ratingBar_line_status.setRating(1 + lineStatus);
             TextView tvLastSubmit = (TextView) findViewById(R.id.last_evaluation_time);
-            tvLastSubmit.setText(BandexFactory.getRestaurant(restaurant_id).getFormattedLastSubmit());
+            tvLastSubmit.setText(BandexFactory.getRestaurant(bandejao).getFormattedLastSubmit());
         }
     }
 
@@ -242,7 +238,6 @@ public class MoreDetailsActivity extends ActionBarActivity {
                             .setLabel("Atualizar Tudo " + me.getTitle().toString())
                             .build());
                     Util.getMenuFromInternet(me);
-                    Util.getLineFromInternet(me);
             }
         });
         mActionBar.setCustomView(mCustomView);

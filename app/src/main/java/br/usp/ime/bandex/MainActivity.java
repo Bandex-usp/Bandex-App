@@ -84,10 +84,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (menu == null) {
             Util.getMenuFromInternet(this);
         } else {
-            Log.d("debugJson", menu);
             Util.jsonMenuToModel(this, menu);
         }
-        Util.getLineFromInternet(this);
     }
 
     @Override
@@ -97,7 +95,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             prepareModel();
         }
         Log.d("[MainActivity]onResume", "onResume called!");
-        Log.d("[MainActivity]onResume", "onResume to the end!");
     }
 
     @Override
@@ -133,7 +130,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         final int pco_details = R.id.activity_main_ll_pco;
         final int evaluate_line = R.id.activity_main_btn_evaluate_line;
         Class clazz = MoreDetailsActivity.class;
-        int extra = Bandejao.CENTRAL;
+        Bandejao extra = Bandejao.CENTRAL;
         Intent intent;
         Boolean changeActivity = true;
 
@@ -198,18 +195,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public void setTextViews() {
         int MISTURA = 0, SOBREMESA = 1, FILA = 2;
-        tvInfo[Bandejao.CENTRAL][MISTURA] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
-        tvInfo[Bandejao.CENTRAL][SOBREMESA] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
-        tvInfo[Bandejao.CENTRAL][FILA] = (TextView) findViewById(R.id.activity_main_central_tv_line);
-        tvInfo[Bandejao.QUIMICA][MISTURA] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
-        tvInfo[Bandejao.QUIMICA][SOBREMESA] = (TextView) findViewById(R.id.activity_main_quimica_tv_sobremesa);
-        tvInfo[Bandejao.QUIMICA][FILA] = (TextView) findViewById(R.id.activity_main_quimica_tv_line);
-        tvInfo[Bandejao.FISICA][MISTURA] = (TextView) findViewById(R.id.activity_main_fisica_tv_mistura);
-        tvInfo[Bandejao.FISICA][SOBREMESA] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
-        tvInfo[Bandejao.FISICA][FILA] = (TextView) findViewById(R.id.activity_main_fisica_tv_line);
-        tvInfo[Bandejao.PCO][MISTURA] = (TextView) findViewById(R.id.activity_main_pco_tv_mistura);
-        tvInfo[Bandejao.PCO][SOBREMESA] = (TextView) findViewById(R.id.activity_main_pco_tv_sobremesa);
-        tvInfo[Bandejao.PCO][FILA] = (TextView) findViewById(R.id.activity_main_pco_tv_line);
+        tvInfo[Bandejao.CENTRAL.getValue()][MISTURA] = (TextView) findViewById(R.id.activity_main_central_tv_mistura);
+        tvInfo[Bandejao.CENTRAL.getValue()][SOBREMESA] = (TextView) findViewById(R.id.activity_main_central_tv_sobremesa);
+        tvInfo[Bandejao.CENTRAL.getValue()][FILA] = (TextView) findViewById(R.id.activity_main_central_tv_line);
+        tvInfo[Bandejao.QUIMICA.getValue()][MISTURA] = (TextView) findViewById(R.id.activity_main_quimica_tv_mistura);
+        tvInfo[Bandejao.QUIMICA.getValue()][SOBREMESA] = (TextView) findViewById(R.id.activity_main_quimica_tv_sobremesa);
+        tvInfo[Bandejao.QUIMICA.getValue()][FILA] = (TextView) findViewById(R.id.activity_main_quimica_tv_line);
+        tvInfo[Bandejao.FISICA.getValue()][MISTURA] = (TextView) findViewById(R.id.activity_main_fisica_tv_mistura);
+        tvInfo[Bandejao.FISICA.getValue()][SOBREMESA] = (TextView) findViewById(R.id.activity_main_fisica_tv_sobremesa);
+        tvInfo[Bandejao.FISICA.getValue()][FILA] = (TextView) findViewById(R.id.activity_main_fisica_tv_line);
+        tvInfo[Bandejao.PCO.getValue()][MISTURA] = (TextView) findViewById(R.id.activity_main_pco_tv_mistura);
+        tvInfo[Bandejao.PCO.getValue()][SOBREMESA] = (TextView) findViewById(R.id.activity_main_pco_tv_sobremesa);
+        tvInfo[Bandejao.PCO.getValue()][FILA] = (TextView) findViewById(R.id.activity_main_pco_tv_line);
     }
 
     public void showLineContentOnScreen() {
@@ -217,19 +214,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
         btn_evaluate_line.setVisibility(View.VISIBLE);
         btn_evaluate_line.setOnClickListener(this);
-        for (int i = 0; i < Util.NUMBER_OF_RESTAURANTS; i++) {
-            Bandex bandex = BandexFactory.getRestaurant(i);
+        for (Bandejao bandejao : Bandejao.possibleValues()) {
+            Bandex bandex = BandexFactory.getRestaurant(bandejao);
             Meal meal = bandex.getDay(Util.getDayOfWeek()).getMeal(Util.getPeriodToShowLine());
             if (meal.isAvailable()) {
                 if (bandex.getLastSubmit() == null) {
-                    tvInfo[i][FILA].setText("Sem informações sobre a fila.");
-                    tvInfo[i][FILA].setTextColor(Color.BLACK);
+                    tvInfo[bandejao.getValue()][FILA].setText("Sem informações sobre a fila.");
+                    tvInfo[bandejao.getValue()][FILA].setTextColor(Color.BLACK);
                 } else {
-                    tvInfo[i][FILA].setText(Util.Fila.CLASSIFICACAO[bandex.getLineStatus()]);
-                    tvInfo[i][FILA].setTextColor(getResources().getColor(Util.Fila.COR[bandex.getLineStatus()]));
+                    tvInfo[bandejao.getValue()][FILA].setText(Util.Fila.CLASSIFICACAO[bandex.getLineStatus()]);
+                    tvInfo[bandejao.getValue()][FILA].setTextColor(getResources().getColor(Util.Fila.COR[bandex.getLineStatus()]));
                 }
             } else {
-                tvInfo[i][FILA].setText("");
+                tvInfo[bandejao.getValue()][FILA].setText("");
             }
         }
     }
@@ -247,19 +244,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     public void showMenuContentOnScreen() {
-        if (Central.getInstance() == null) {
+        if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null) {
             prepareModel();
             return;
         }
-        showInfoBox(Central.getInstance());
-        showInfoBox(Quimica.getInstance());
-        showInfoBox(Fisica.getInstance());
-        showInfoBox(PCO.getInstance());
+
+        for (Bandejao bandejao : Bandejao.possibleValues()) {
+            showInfoBox(BandexFactory.getRestaurant(bandejao));
+        }
 
         TextView tvGeneralInfo = (TextView) findViewById(R.id.activity_main_tv_general_info);
         if (Util.isMenuUpdated()) {
-            tvGeneralInfo.setText(Periodo.LUNCH_DINNER_STR[Util.getPeriodToShowMenu()] +
-                    " - " + BandexFactory.getRestaurant(0).getDay(Util.getDayOfWeek()).getDateName()
+            tvGeneralInfo.setText(Util.Period.possibleValues()[(Util.getPeriodToShowMenu())].getName() +
+                    " - " + BandexFactory.getRestaurant(Bandejao.CENTRAL).getDay(Util.getDayOfWeek()).getDateName()
                     + " (" + (getResources().getStringArray(R.array.days_array))[Util.getDayOfWeek()] + ")");
         } else {
             tvGeneralInfo.setText("O cardápio ainda não foi atualizado! Mostrando do dia " + Util.getFormattedMenuDate());
@@ -284,6 +281,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+        //return super.onCreateOptionsMenu(menu);
     }
 
     public void setCustomActionBar() {
@@ -318,7 +316,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         .setLabel("Atualizar Tudo " + me.getTitle().toString())
                         .build());
                 Util.getMenuFromInternet(me);
-                Util.getLineFromInternet(me);
             }
         });
         mActionBar.setCustomView(mCustomView);

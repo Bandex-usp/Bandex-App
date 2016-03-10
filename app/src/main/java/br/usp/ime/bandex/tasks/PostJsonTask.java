@@ -3,6 +3,8 @@ package br.usp.ime.bandex.tasks;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.Debug;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -47,6 +49,7 @@ public class PostJsonTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... params) { // json e url
         JSONPoster jsonPoster = new JSONPoster();
         HttpResponse response = jsonPoster.postJSONToURL(params[0], params[1]);
+        Log.d("JsonPOST:", params[0]);
         if (response != null) {
             return response.toString();
         }

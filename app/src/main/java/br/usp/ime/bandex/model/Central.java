@@ -1,6 +1,11 @@
 package br.usp.ime.bandex.model;
 
+import android.app.Activity;
+
 import org.json.JSONObject;
+
+import br.usp.ime.bandex.MainActivity;
+import br.usp.ime.bandex.Util;
 
 /**
  * Created by Wagner on 22/02/2016.

@@ -27,7 +27,7 @@ public class PCO extends Bandex {
 
     @Override
     public String getName() {
-        return "PCO";
+        return "Prefeitura";
     }
 
 

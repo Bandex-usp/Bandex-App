@@ -28,13 +28,13 @@ import java.util.Calendar;
 import java.util.Date;
 
 import br.usp.ime.bandex.Util.Bandejao;
+import br.usp.ime.bandex.model.BandexFactory;
 import br.usp.ime.bandex.tasks.PostJsonTask;
 
 
 public class EvaluateLineActivity extends ActionBarActivity {
 
-    public int NOTHING = 3;
-    public int chosenRestaurant = NOTHING;
+    public Bandejao chosenRestaurant = Bandejao.NONE;
     public int evaluation = 0; // Valores possíveis: 1 a 5
     public static TextView tvRatingStatus;
     public static GoogleAnalytics analytics;
@@ -94,7 +94,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
                 if (evaluation == 0) {
                     (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5!", Toast.LENGTH_SHORT)).show();
                 } else {
-                    if (chosenRestaurant == NOTHING) {
+                    if (chosenRestaurant == Bandejao.NONE) {
                         (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
                     } else if (diferenca_em_minutos > 0){
                         (Toast.makeText(getApplicationContext(), String.format("Ops! Próxima avaliação disponível daqui a %d minuto(s)!", diferenca_em_minutos), Toast.LENGTH_LONG)).show();
@@ -110,17 +110,17 @@ public class EvaluateLineActivity extends ActionBarActivity {
         });
     }
 
-    public void avaliar(int evaluation, int chosenRestaurant) {
+    public void avaliar(int evaluation, Bandejao chosenRestaurant) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("restaurant_id", chosenRestaurant);
+            jsonObject.put("restaurant_id", chosenRestaurant.getValue());
             jsonObject.put("status", evaluation);
             jsonObject.put("submit_date", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()));
             (new PostJsonTask(this)).execute(jsonObject.toString(), getString(R.string.line_post_service_url));
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Fila")
                     .setAction("Enviar avaliação")
-                    .setLabel("Enviar avaliação da fila - " + Bandejao.RESTAURANTES[chosenRestaurant])
+                    .setLabel("Enviar avaliação da fila - " + BandexFactory.getRestaurant(chosenRestaurant).getName())
                     .build());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -145,6 +145,10 @@ public class EvaluateLineActivity extends ActionBarActivity {
                 if (checked)
                     chosenRestaurant = Bandejao.FISICA;
                     break;
+            case R.id.activity_evaluate_line_rb_pco:
+                if (checked)
+                    chosenRestaurant = Bandejao.PCO;
+                break;
         }
     }
 

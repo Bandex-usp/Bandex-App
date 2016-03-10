@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,7 +32,6 @@ import br.usp.ime.bandex.tasks.GetMenuJsonTask;
  */
 public class Util {
 
-    public static final int NUMBER_OF_RESTAURANTS = 4;
     public static final int MENU_JSON_TASK_ID = 0;
     public static final int LINE_JSON_TASK_ID = 1;
 
@@ -58,14 +58,88 @@ public class Util {
 
     }
 
-    public static class Bandejao  {
-        public static final int CENTRAL = 0, QUIMICA = 1, FISICA = 2, PCO = 3;
-        public static String[] RESTAURANTES = {"Central", "Química", "Física"};
+    public enum Period {
+        LUNCH(0) {
+            @Override
+            public String getName() {
+                return "Almoço";
+            }
+        },
+        DINNER(1) {
+            @Override
+            public String getName() {
+                return "Jantar";
+            }
+        },
+        NONE(-1) {
+            @Override
+            public String getName() {
+                return "Not a valid period";
+            }
+        };
+
+
+        /* Eliminates the null object */
+        public static Period[] possibleValues() {
+            return Arrays.copyOf(Period.values(), Period.values().length - 1);
+        }
+
+        int id;
+        Period(int i) {
+            this.id = i;
+        }
+
+        public abstract String getName();
+    }
+
+    public enum Bandejao  {
+        CENTRAL(0) {
+            @Override
+            public Bandex getInstance() {
+                return Central.getInstance();
+            }
+        },
+        QUIMICA(1) {
+            @Override
+            public Bandex getInstance() {
+                return Quimica.getInstance();
+            }
+        }, FISICA(2) {
+            @Override
+            public Bandex getInstance() {
+                return Fisica.getInstance();
+            }
+        }, PCO(3) {
+            @Override
+            public Bandex getInstance() {
+                return br.usp.ime.bandex.model.PCO.getInstance();
+            }
+        }, NONE(-1) {
+            @Override
+            public Bandex getInstance() {
+                return null;
+            }
+        };
+
+        /* Eliminates the null object */
+        public static Bandejao[] possibleValues() {
+            return Arrays.copyOf(Bandejao.values(), Bandejao.values().length - 1);
+        }
+
+        private int value;
+        Bandejao(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public abstract Bandex getInstance();
     }
 
     public static class Periodo  {
         public static int LUNCH = 0, DINNER = 1, NOTHING = 2;
-        public static String []LUNCH_DINNER_STR = {"Almoço", "Jantar"};
 
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
@@ -120,18 +194,18 @@ public class Util {
     public static boolean jsonLineToModel(Activity caller, String jsonLineRepresentation) {
         try {
             JSONObject jsonLine = new JSONObject(jsonLineRepresentation);
-            for (Integer j = 0; j < NUMBER_OF_RESTAURANTS-1; j++) { // Percorre array de avaliações do json
-                JSONObject jsonRestaurant = jsonLine.getJSONObject(j.toString());
+            for (Bandejao bandejao : Bandejao.possibleValues()) {
+                JSONObject jsonRestaurant = jsonLine.getJSONObject("" + bandejao.value);
                 int status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
                 Date submitDate = null;
                 try {
-                    submitDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-02:00").parse(jsonRestaurant.getString("last_submit"));
+                    submitDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-03:00").parse(jsonRestaurant.getString("last_submit"));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 if (status > 4) status = 4;
-                BandexFactory.getRestaurant(j).setLineStatus(status);
-                BandexFactory.getRestaurant(j).setLastSubmit(submitDate);
+                BandexFactory.getRestaurant(bandejao).setLineStatus(status);
+                BandexFactory.getRestaurant(bandejao).setLastSubmit(submitDate);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -196,11 +270,12 @@ public class Util {
         try {
             JSONArray jsonMenu = new JSONArray(jsonMenuRepresentation);
             Log.d("debugJson", jsonMenuRepresentation);
-            Central.initialize(jsonMenu.getJSONObject(Bandejao.CENTRAL));
-            Quimica.initialize(jsonMenu.getJSONObject(Bandejao.QUIMICA));
-            Fisica.initialize(jsonMenu.getJSONObject(Bandejao.FISICA));
-            PCO.initialize(jsonMenu.getJSONObject(Bandejao.PCO));
+            Central.initialize(jsonMenu.getJSONObject(Bandejao.CENTRAL.value));
+            Quimica.initialize(jsonMenu.getJSONObject(Bandejao.QUIMICA.value));
+            Fisica.initialize(jsonMenu.getJSONObject(Bandejao.FISICA.value));
+            PCO.initialize(jsonMenu.getJSONObject(Bandejao.PCO.value));
             setMenuDate(PCO.getInstance().getDay(6).getDate());
+            Util.getLineFromInternet(caller);
 
             if (caller instanceof MainActivity) {
                 ((MainActivity)caller).showMenuContentOnScreen();
@@ -228,21 +303,26 @@ public class Util {
         return (cal.get(Calendar.DAY_OF_WEEK) + 5) % 7; // Calendar.Monday == 2. In this code, Monday = 0.
     }
 
-    public static boolean isClosed(int restaurantId, int dayOfWeek, int period) {
-        Bandex bandex = BandexFactory.getRestaurant(restaurantId);
+    public static boolean isClosed(Bandejao bandejao, int dayOfWeek, int period) {
+        Bandex bandex = BandexFactory.getRestaurant(bandejao);
         return !(bandex.getDay(dayOfWeek).getMeal(period).isAvailable());
     }
 
-    private static boolean isClosed(int restaurantId) {
+    private static boolean isClosed(Bandejao restaurantId) {
         return isClosed(restaurantId, Util.getDayOfWeek(), Util.getPeriodToShowLine());
     }
 
     public static boolean canEvaluate() {
-        return !(Util.getPeriodToShowLine() == Periodo.NOTHING ||
-                (Util.isClosed(Bandejao.CENTRAL) && Util.isClosed(Bandejao.FISICA)
-                        && Util.isClosed(Bandejao.QUIMICA) && Util.isClosed(Bandejao.PCO)));
+        return !(getPeriodToShowLine() == Periodo.NOTHING || allClosed());
     }
 
+    public static boolean allClosed() {
+        boolean closed = true;
+        for (Bandejao bandejao : Bandejao.possibleValues()) {
+            closed = closed && isClosed(bandejao);
+        }
+        return closed;
+    }
     // Verifica se está atualizado o cardápio
     public static boolean isMenuUpdated() {
         Date agora = Calendar.getInstance().getTime();
@@ -271,11 +351,10 @@ public class Util {
     }
 
     public static int getPeriodToShowLine() {
-        return Periodo.LUNCH;
-        /*if (inRangeOfLunch()) {
+        if (inRangeOfLunch()) {
             return Periodo.LUNCH;
         } else if (inRangeOfDinner()) {
             return Periodo.DINNER;
-        } else return Periodo.NOTHING;*/
+        } else return Periodo.NOTHING;
     }
 }

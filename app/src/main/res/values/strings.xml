@@ -2,7 +2,7 @@
     <string name="app_name">Bandex Agora</string>
     <string name="action_settings">Settings</string>
 
-    <string name="title_pco">PCO</string>
+    <string name="title_pco">Prefeitura</string>
     <string name="title_quimica">Química</string>
     <string name="title_central">Central</string>
     <string name="title_fisica">Física</string>
@@ -24,11 +24,11 @@
     <string name="title_bad_line">Fila Grande</string>
     <string name="title_horrible_line">Fila Enorme</string>
 
-    <string name="menu_service_url">https://raw.githubusercontent.com/Bandex-usp/Bandex-App/master/menu_fake.json</string>
-    <!--string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string-->
+    <!--string name="menu_service_url">https://raw.githubusercontent.com/Bandex-usp/Bandex-App/master/menu_fake.json</string-->
+    <string name="menu_service_url">http://bandexweb.herokuapp.com/menu.json</string>
     <string name="line_post_service_url">http://bandexweb.herokuapp.com/line_statuses.json</string>
-    <!--string name="line_get_service_url">http://bandexweb.herokuapp.com/line_status.json</string-->
-    <string name="line_get_service_url">https://raw.githubusercontent.com/Bandex-usp/Bandex-App/master/line_fake.json</string>
+    <string name="line_get_service_url">http://bandexweb.herokuapp.com/line_status.json</string>
+    <!--string name="line_get_service_url">https://raw.githubusercontent.com/Bandex-usp/Bandex-App/master/line_fake.json</string!-->
 
 
     <string name="text_new_functionality">Agora você pode ficar sabendo quando os bandejões estarão fechados por motivos excepcionais, como falta d\'água ou paralisação dos funcionários.</string>
