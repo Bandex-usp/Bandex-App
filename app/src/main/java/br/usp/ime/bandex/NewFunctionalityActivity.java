@@ -45,7 +45,7 @@ public class NewFunctionalityActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("alreadyAnsweredPushNotifications", true);
+                editor.putBoolean("newUser", false);
                 tracker.send(new HitBuilders.EventBuilder()
                         .setCategory("Push Notifications")
                         .setAction("Desabilitar Notificações")
@@ -59,7 +59,7 @@ public class NewFunctionalityActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("alreadyAnsweredPushNotifications", true);
+                editor.putBoolean("newUser", false);
                 editor.putBoolean("enableNotifications", true);
                 tracker.send(new HitBuilders.EventBuilder()
                         .setCategory("Push Notifications")

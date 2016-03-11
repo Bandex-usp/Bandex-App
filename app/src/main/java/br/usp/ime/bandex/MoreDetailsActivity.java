@@ -148,6 +148,14 @@ public class MoreDetailsActivity extends ActionBarActivity {
         }
     }
 
+    public void updateMenuContentOnScreen() {
+        showMenuContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
+    }
+
+    public void updateLineContentOnScreen() {
+        showLineContentOnScreen(currentRestaurantOnScreen, currentDayOfWeekOnScreen, currentPeriodOnScreen);
+    }
+
     public void showMenuContentOnScreen(Bandejao bandejao, int day_of_week, int period) {
         Bandex restaurant = BandexFactory.getRestaurant(bandejao);
         TextView tv_entry_date = (TextView) findViewById(R.id.tv_entry_date);

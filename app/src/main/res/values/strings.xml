@@ -84,10 +84,10 @@
     <string name="fa_chevron_right">&#xf054;</string>
     <string name="closedRestaurant">Restaurante Fechado.</string>
 
-
+    <string name="preferences_line_cache_time">line_cache_time</string>
     <string name="preferences_line_cache">line_cache</string>
-    <string name="preferences_menu_cache">menu_cache_new1</string>
-    <string name="preferences_entry_date_cache">entry_date_new1</string>
+    <string name="preferences_menu_cache">menu_cache_new</string>
+    <string name="preferences_entry_date_cache">entry_date_new</string>
     <string name="title_activity_more_details">Mais detalhes</string>
 
     <string name="title_activity_evaluate_line">Avaliar Fila</string>

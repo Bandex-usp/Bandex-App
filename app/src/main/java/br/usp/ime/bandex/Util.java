@@ -64,17 +64,32 @@ public class Util {
             public String getName() {
                 return "Almoço";
             }
+
+            @Override
+            public String getStart() {
+                return "11:00";
+            }
         },
         DINNER(1) {
             @Override
             public String getName() {
                 return "Jantar";
             }
+
+            @Override
+            public String getStart() {
+                return "17:00";
+            }
         },
         NONE(-1) {
             @Override
             public String getName() {
                 return "Not a valid period";
+            }
+
+            @Override
+            public String getStart() {
+                return "00:00";
             }
         };
 
@@ -90,6 +105,7 @@ public class Util {
         }
 
         public abstract String getName();
+        public abstract String getStart();
     }
 
     public enum Bandejao  {
@@ -143,18 +159,18 @@ public class Util {
 
         public static Calendar horarioAlmoco[] = new Calendar[2];
         public static Calendar horarioJantar[] = new Calendar[2];
-        private static String horariosAlmocoStr[] = {"11:00:00", "14:20:00"};
-        private static String horariosJantarStr[] = {"17:00:00", "19:45:00"};
+        private static String horariosAlmocoStr[] = {"11:00", "14:20"};
+        private static String horariosJantarStr[] = {"17:00", "19:45"};
         public static int INICIO = 0, FIM = 1;
         static {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                 for (int i = 0; i < 2; i++) {
                     horarioAlmoco[i] = Calendar.getInstance();
-                    horarioAlmoco[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").
+                    horarioAlmoco[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm").
                             parse(sdf.format(horarioAlmoco[i].getTime()) + " " + horariosAlmocoStr[i]));
                     horarioJantar[i] = Calendar.getInstance();
-                    horarioJantar[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").
+                    horarioJantar[i].setTime(new SimpleDateFormat("dd-MM-yyyy HH:mm").
                             parse(sdf.format(horarioJantar[i].getTime()) + " " + horariosJantarStr[i]));
                 }
             } catch (ParseException p) {
@@ -172,6 +188,12 @@ public class Util {
                     Toast.makeText(caller, "Ops! Não foi possível pegar as informações sobre a fila.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                SharedPreferences sharedPreferences = caller.getSharedPreferences("fila", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(caller.getString(R.string.preferences_line_cache), json);
+                editor.putString(caller.getString(R.string.preferences_line_cache_time),
+                        new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()));
+                editor.apply();
                 Log.d("Debug setLineJson", "ok");
                 break;
             case Util.MENU_JSON_TASK_ID:
@@ -180,10 +202,10 @@ public class Util {
                     return;
                 } else {
                     SharedPreferences sharedPref = caller.getSharedPreferences("cardapio", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(caller.getString(R.string.preferences_menu_cache), json);
-                    editor.putString(caller.getString(R.string.preferences_entry_date_cache), getFormattedMenuDate());
-                    editor.apply();
+                    SharedPreferences.Editor edit = sharedPref.edit();
+                    edit.putString(caller.getString(R.string.preferences_menu_cache), json);
+                    edit.putString(caller.getString(R.string.preferences_entry_date_cache), getFormattedMenuDate());
+                    edit.apply();
                 }
                 Log.d("Debug setMenuJson", "ok");
                 break;
@@ -216,7 +238,7 @@ public class Util {
             if (caller instanceof MainActivity) {
                 ((MainActivity) caller).showLineContentOnScreen();
             } else {
-
+                ((MoreDetailsActivity) caller).updateLineContentOnScreen();
             }
         }
         return true;
@@ -240,11 +262,39 @@ public class Util {
         return null;
     }
 
-    public static void getMenuFromInternet(Activity caller) {
+    public static String getLineFromCache(Activity caller) {
+        SharedPreferences sharedPreferences = caller.getSharedPreferences("fila", Activity.MODE_PRIVATE);
+        Date lastLineSave = null;
+        try {
+            String timeString = sharedPreferences.getString(caller.getString(R.string.preferences_line_cache_time), null);
+            if (timeString != null) {
+                lastLineSave = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(timeString);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (lastLineSave != null) {
+            Calendar saved = Calendar.getInstance();
+            saved.setTime(lastLineSave);
+            saved.add(Calendar.MINUTE, 2);
+
+            if (saved.before(Calendar.getInstance())) {
+                return null;
+            }
+        }
+        return sharedPreferences.getString(caller.getString(R.string.preferences_line_cache), null);
+    }
+
+    public static boolean isConnected(Activity caller) {
         ConnectivityManager connMgr = (ConnectivityManager)
                 caller.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    public static void getMenuFromInternet(Activity caller) {
+        if (isConnected(caller)) {
             new GetMenuJsonTask(caller).execute(caller.getString(R.string.menu_service_url));
         } else {
             Toast.makeText(caller.getApplicationContext(), "Sem conexão para atualizar o cardápio!", Toast.LENGTH_SHORT).show();
@@ -255,10 +305,7 @@ public class Util {
         if (!Util.canEvaluate()) {
             return;
         }
-        ConnectivityManager connMgr = (ConnectivityManager)
-                caller.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (isConnected(caller)) {
             new GetLineJsonTask(caller).execute(caller.getString(R.string.line_get_service_url));
         } else {
             Toast.makeText(caller.getApplicationContext(), "Sem conexão para pegar o estado das filas!", Toast.LENGTH_SHORT).show();
@@ -275,12 +322,18 @@ public class Util {
             Fisica.initialize(jsonMenu.getJSONObject(Bandejao.FISICA.value));
             PCO.initialize(jsonMenu.getJSONObject(Bandejao.PCO.value));
             setMenuDate(PCO.getInstance().getDay(6).getDate());
-            Util.getLineFromInternet(caller);
+
+            String jsonLine = Util.getLineFromCache(caller);
+            if (jsonLine == null) {
+                Util.getLineFromInternet(caller);
+            } else {
+                Util.jsonLineToModel(caller, jsonLine);
+            }
 
             if (caller instanceof MainActivity) {
                 ((MainActivity)caller).showMenuContentOnScreen();
             } else {
-
+                ((MoreDetailsActivity) caller).updateMenuContentOnScreen();
             }
         } catch (JSONException e) {
             Toast.makeText(caller, "Desculpe! Erro nos dados do servidor.", Toast.LENGTH_SHORT).show();
@@ -308,13 +361,14 @@ public class Util {
         return !(bandex.getDay(dayOfWeek).getMeal(period).isAvailable());
     }
 
-    private static boolean isClosed(Bandejao restaurantId) {
-        return isClosed(restaurantId, Util.getDayOfWeek(), Util.getPeriodToShowLine());
+    public static boolean isClosed(Bandejao bandejao) {
+        return isClosed(bandejao, Util.getDayOfWeek(), Util.getPeriodToShowMenu());
     }
 
     public static boolean canEvaluate() {
         return !(getPeriodToShowLine() == Periodo.NOTHING || allClosed());
     }
+
 
     public static boolean allClosed() {
         boolean closed = true;
@@ -351,6 +405,7 @@ public class Util {
     }
 
     public static int getPeriodToShowLine() {
+        /*return getPeriodToShowMenu();*/ // P/ testes
         if (inRangeOfLunch()) {
             return Periodo.LUNCH;
         } else if (inRangeOfDinner()) {

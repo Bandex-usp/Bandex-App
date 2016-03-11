@@ -21,14 +21,9 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import br.usp.ime.bandex.Util.Bandejao;
-import br.usp.ime.bandex.Util.Periodo;
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.BandexFactory;
-import br.usp.ime.bandex.model.Central;
-import br.usp.ime.bandex.model.Fisica;
 import br.usp.ime.bandex.model.Meal;
-import br.usp.ime.bandex.model.PCO;
-import br.usp.ime.bandex.model.Quimica;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -37,46 +32,52 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public static GoogleAnalytics analytics;
     public static Tracker tracker;
 
+    /* Push Notifications */
+    public boolean newInstalation() {
+        SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("newUser", true);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("[MainActivity]onCreate", "inicio!");
         super.onCreate(savedInstanceState);
+        prepareAnalytics();
+        setContentView(R.layout.activity_main);
+        prepareFrontEnd();
+        setTextViews();
 
-        /* Push Notifications */
-        SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        boolean goodNews = sharedPreferences.getBoolean("alreadyAnsweredPushNotifications", false);
-        if (!goodNews) {
+        if (newInstalation()) {
             Intent intent = new Intent(getApplicationContext(), NewFunctionalityActivity.class);
             startActivity(intent);
-        } else {
-            /* Analytics */
-            analytics = GoogleAnalytics.getInstance(this);
-            analytics.setLocalDispatchPeriod(1800);
-            tracker = analytics.newTracker("UA-68378292-2");
-            tracker.enableExceptionReporting(true);
-            tracker.enableAdvertisingIdCollection(true);
-            tracker.enableAutoActivityTracking(true);
-            tracker.setScreenName("MainActivity");
-
-            setContentView(R.layout.activity_main);
-            setTextViews();
-            prepareModel();
-
-            /* Botões de mais detalhes */
-            Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
-            TextView button = (TextView)findViewById(R.id.arrow1);
-            button.setTypeface(font);
-            TextView button2 = (TextView)findViewById(R.id.arrow2);
-            button2.setTypeface(font);
-            TextView button3 = (TextView)findViewById(R.id.arrow3);
-            button3.setTypeface(font);
-            TextView button4 = (TextView)findViewById(R.id.arrow4);
-            button4.setTypeface(font);
-
-            Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
-            btn_evaluate_line.setVisibility(View.VISIBLE);
-            btn_evaluate_line.setOnClickListener(this);
-            setCustomActionBar();
         }
+    }
+
+    public void prepareAnalytics() {
+        analytics = GoogleAnalytics.getInstance(this);
+        analytics.setLocalDispatchPeriod(1800);
+        tracker = analytics.newTracker("UA-68378292-2");
+        tracker.enableExceptionReporting(true);
+        tracker.enableAdvertisingIdCollection(true);
+        tracker.enableAutoActivityTracking(true);
+        tracker.setScreenName("MainActivity");
+    }
+
+    public void prepareFrontEnd() {
+        /* Setas para ir aos mais detalhes */
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
+        TextView button = (TextView)findViewById(R.id.arrow1);
+        button.setTypeface(font);
+        TextView button2 = (TextView)findViewById(R.id.arrow2);
+        button2.setTypeface(font);
+        TextView button3 = (TextView)findViewById(R.id.arrow3);
+        button3.setTypeface(font);
+        TextView button4 = (TextView)findViewById(R.id.arrow4);
+        button4.setTypeface(font);
+
+        Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
+        btn_evaluate_line.setVisibility(View.VISIBLE);
+        setCustomActionBar();
     }
 
     public void prepareModel() {
@@ -91,7 +92,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null) {
+        if (!newInstalation()) {
             prepareModel();
         }
         Log.d("[MainActivity]onResume", "onResume called!");
@@ -101,7 +102,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onRestart() {
         super.onRestart();
         Log.d("[MainActivity]onRestart", "onRestart called!");
-        prepareModel();
+        //prepareModel();
     }
 
     @Override
@@ -136,6 +137,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case central_details:
+                Log.d("OnClick", "Central");
                 extra = Bandejao.CENTRAL;
                 tracker.send(new HitBuilders.EventBuilder()
                         .setCategory("All")
@@ -177,8 +179,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             .setLabel("Ir para avaliar Fila - Todos")
                             .build());
                 } else {
+                    if (Util.allClosed()) {
+                        Toast.makeText(this, "Restaurantes todos fechados!", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Avaliação disponível a partir das " + Util.Period.values()[Util.getPeriodToShowMenu()].getStart() + "!", Toast.LENGTH_LONG).show();
+                    }
                     changeActivity = false;
-                    Toast.makeText(this, "Ops! Avaliação disponível apenas nos horários de funcionamento do bandejão.", Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -213,7 +219,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         int FILA = 2;
         Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
         btn_evaluate_line.setVisibility(View.VISIBLE);
-        btn_evaluate_line.setOnClickListener(this);
         for (Bandejao bandejao : Bandejao.possibleValues()) {
             Bandex bandex = BandexFactory.getRestaurant(bandejao);
             Meal meal = bandex.getDay(Util.getDayOfWeek()).getMeal(Util.getPeriodToShowLine());
@@ -269,11 +274,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         LinearLayout btn_quimica_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_quimica);
         LinearLayout btn_fisica_more_details =  (LinearLayout) findViewById(R.id.activity_main_ll_fisica);
         LinearLayout btn_pco_more_details =  (LinearLayout) findViewById(R.id.activity_main_ll_pco);
+        Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
 
         btn_pco_more_details.setOnClickListener(this);
         btn_central_more_details.setOnClickListener(this);
         btn_quimica_more_details.setOnClickListener(this);
         btn_fisica_more_details.setOnClickListener(this);
+        btn_evaluate_line.setOnClickListener(this);
     }
 
     @Override
@@ -315,7 +322,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         .setAction("Atualizar Tudo")
                         .setLabel("Atualizar Tudo " + me.getTitle().toString())
                         .build());
-                Util.getMenuFromInternet(me);
+
+                if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null) {
+                    prepareModel();
+                } else {
+                    Util.getMenuFromInternet(me);
+                    Util.getLineFromInternet(me);
+                }
+
             }
         });
         mActionBar.setCustomView(mCustomView);

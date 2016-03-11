@@ -1,5 +1,6 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -26,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.model.BandexFactory;
@@ -69,6 +71,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
             }
         });
 
+        final Activity me = this;
         Button btn_send = (Button) findViewById(R.id.activity_evaluate_line_btn_send);
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,35 +79,34 @@ public class EvaluateLineActivity extends ActionBarActivity {
                 RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
                 evaluation = (int) ratingBar.getRating();
                 SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+
                 String nextEvaluationTime = sharedPreferences.getString("nextEvaluationTime", null);
                 final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
-                int diferenca_em_minutos = 0;
+                int minutesUntilEvaluation = 0;
                 if (nextEvaluationTime != null) {
                     try {
                         Date nextEvaluationTimeDate = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(nextEvaluationTime);
                         Date now = Calendar.getInstance().getTime();
                         if (now.before(nextEvaluationTimeDate)) {
-                            diferenca_em_minutos = (int) ((nextEvaluationTimeDate.getTime() - now.getTime())/ONE_MINUTE_IN_MILLIS + 1);
+                            minutesUntilEvaluation = (int) ((nextEvaluationTimeDate.getTime() - now.getTime())/ONE_MINUTE_IN_MILLIS + 1);
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
-                if (evaluation == 0) {
+
+                if (!Util.isConnected(me)) {
+                    (Toast.makeText(getApplicationContext(), "Sem conexão com a internet!", Toast.LENGTH_SHORT)).show();
+                } else if (evaluation == 0) {
                     (Toast.makeText(getApplicationContext(), "Escolha uma nota de 1 a 5!", Toast.LENGTH_SHORT)).show();
+                } else if (chosenRestaurant == Bandejao.NONE) {
+                    (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
+                } else if (Util.isClosed(chosenRestaurant)) {
+                    (Toast.makeText(getApplicationContext(), "Esse restaurante está fechado agora!", Toast.LENGTH_SHORT)).show();
+                } else if (minutesUntilEvaluation > 0){
+                    (Toast.makeText(getApplicationContext(), String.format("Próxima avaliação disponível daqui a %d minuto(s)!", minutesUntilEvaluation), Toast.LENGTH_LONG)).show();
                 } else {
-                    if (chosenRestaurant == Bandejao.NONE) {
-                        (Toast.makeText(getApplicationContext(), "Escolha um restaurante!", Toast.LENGTH_SHORT)).show();
-                    } else if (diferenca_em_minutos > 0){
-                        (Toast.makeText(getApplicationContext(), String.format("Ops! Próxima avaliação disponível daqui a %d minuto(s)!", diferenca_em_minutos), Toast.LENGTH_LONG)).show();
-                    } else {
-                        Date nextEvaluationTimeDate = new Date();
-                        nextEvaluationTimeDate.setTime(nextEvaluationTimeDate.getTime() + (15 * ONE_MINUTE_IN_MILLIS));
-                        editor.putString("nextEvaluationTime", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(nextEvaluationTimeDate));
-                        editor.commit();
-                        avaliar(evaluation - 1, chosenRestaurant);
-                    }
+                    avaliar(evaluation - 1, chosenRestaurant);
                 }
             }
         });
@@ -113,9 +115,11 @@ public class EvaluateLineActivity extends ActionBarActivity {
     public void avaliar(int evaluation, Bandejao chosenRestaurant) {
         JSONObject jsonObject = new JSONObject();
         try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT-3"));
             jsonObject.put("restaurant_id", chosenRestaurant.getValue());
             jsonObject.put("status", evaluation);
-            jsonObject.put("submit_date", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime()));
+            jsonObject.put("submit_date", simpleDateFormat.format(Calendar.getInstance().getTime()));
             (new PostJsonTask(this)).execute(jsonObject.toString(), getString(R.string.line_post_service_url));
             tracker.send(new HitBuilders.EventBuilder()
                     .setCategory("Fila")

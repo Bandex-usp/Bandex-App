@@ -2,12 +2,16 @@ package br.usp.ime.bandex.tasks;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Debug;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import br.usp.ime.bandex.R;
 import br.usp.ime.bandex.http.JSONPoster;
@@ -61,6 +65,13 @@ public class PostJsonTask extends AsyncTask<String, String, String> {
         super.onPostExecute(s);
         pDialog.dismiss();
         if (s != null) {
+            final long ONE_MINUTE_IN_MILLIS = 60000;
+            Date nextEvaluationTimeDate = new Date();
+            nextEvaluationTimeDate.setTime(nextEvaluationTimeDate.getTime() + (15 * ONE_MINUTE_IN_MILLIS));
+            SharedPreferences sharedPreferences = caller.getSharedPreferences("myPrefs", Activity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("nextEvaluationTime", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(nextEvaluationTimeDate));
+            editor.apply();
             Toast.makeText(caller.getApplicationContext(), getFinishMessage(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(caller.getApplicationContext(), getErrorMessage(), Toast.LENGTH_SHORT).show();
