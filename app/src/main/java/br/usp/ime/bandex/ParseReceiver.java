@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.parse.ParsePushBroadcastReceiver;
 
@@ -39,8 +40,10 @@ public class ParseReceiver extends ParsePushBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d("parse", "notification received");
         SharedPreferences sharedPrefs = context.getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
-            if (sharedPrefs.getBoolean("enableNotifications", false))
+        if (sharedPrefs.getBoolean("enableNotifications", false)) {
                 super.onReceive(context, intent);
+            }
     }
 }

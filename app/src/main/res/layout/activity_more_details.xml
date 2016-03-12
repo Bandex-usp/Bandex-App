@@ -183,17 +183,6 @@
                         android:id="@+id/activity_more_details_tv_title_line_status"
                         android:layout_gravity="center"
                         android:layout_weight="1"/>
-                    <ImageButton
-                        android:id="@+id/imageButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dp"
-                        android:background="@null"
-                        android:src="@drawable/refresh"
-                        android:scaleType="fitXY"
-                        android:onClick="updateLineStatus"/>
                     </LinearLayout>
 
 

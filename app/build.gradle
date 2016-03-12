@@ -14,7 +14,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 22
         versionCode 7
-        versionName "beta"
+        versionName "gama1"
     }
     buildTypes {
         release {

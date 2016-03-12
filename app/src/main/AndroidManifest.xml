@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.c2dm.permission.RECEIVE" />
 
     <!--
       IMPORTANT: Change "com.parse.starter.permission.C2D_MESSAGE" in the lines below
@@ -27,7 +27,7 @@
         android:icon="@drawable/diningicon"
         android:label="@string/app_name"
         android:logo="@mipmap/usp_logo"
-        android:theme="@style/Theme.AppCompat.Light" >
+        android:theme="@style/AppTheme" >
 
         <!--
         Add the following meta-data for devices running Google Play service.
@@ -38,7 +38,8 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,6 +65,15 @@
                 android:value="br.usp.ime.bandex.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".PreferencesActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_preferences"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="br.usp.ime.bandex.MainActivity" />
+        </activity>
 
         <service android:name="com.parse.PushService" />
 
@@ -83,7 +93,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-<!--                   IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
+                <!-- IMPORTANT: Change "com.parse.starter" to match your app's package name. -->
                 <category android:name="br.usp.ime.bandex" />
             </intent-filter>
         </receiver>
@@ -95,7 +105,7 @@
         <activity
             android:name=".NewFunctionalityActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_new_functionality">
+            android:label="@string/title_activity_new_functionality" >
         </activity>
     </application>
 

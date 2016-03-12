@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -93,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         if (!newInstalation()) {
-            prepareModel();
+            prepareModel(); //TODO: onResume sendo chamado antes do menu ser criado
         }
         Log.d("[MainActivity]onResume", "onResume called!");
     }
@@ -182,7 +183,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     if (Util.allClosed()) {
                         Toast.makeText(this, "Restaurantes todos fechados!", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, "Avaliação disponível a partir das " + Util.Period.values()[Util.getPeriodToShowMenu()].getStart() + "!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Ops... Avaliação disponível somente nos horários de almoço ou jantar!", Toast.LENGTH_LONG).show();
                     }
                     changeActivity = false;
                 }
@@ -286,9 +287,67 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        Log.d("[menu]", "onCreateOptionsMenu called!");
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
         //return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        Log.d("[menu]", "onPrepareOptionsMenu called!");
+        if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null || !Util.canEvaluate()) {
+            hideOption(menu, R.id.action_update_line);
+        } else {
+            showOption(menu, R.id.action_update_line);
+        }
+        return true;
+    }
+
+    public void showOption(Menu menu, int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(true);
+    }
+
+    private void hideOption(Menu menu, int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_update_line:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Fila")
+                        .setAction("Atualizar Fila")
+                        .setLabel("Atualizar Fila - " + getTitle().toString())
+                        .build());
+                Util.getLineFromInternet(this);
+                return true;
+            case R.id.action_update_menu:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Cardápio")
+                        .setAction("Atualizar Cardápio")
+                        .setLabel("Atualizar Cardápio - " + getTitle().toString())
+                        .build());
+                Util.getMenuFromInternet(this);
+                return true;
+            case R.id.action_settings:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Preferências")
+                        .setAction("Ir Para Preferências")
+                        .setLabel("Ir Para Preferências - " + getTitle().toString())
+                        .build());
+                        Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
+                        startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void setCustomActionBar() {
@@ -310,28 +369,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         tvActionBar.setText(this.getTitle());
         tvActionBar.setTypeface(face);
 
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        final ActionBarActivity me = this;
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                tracker.send(new HitBuilders.EventBuilder()
-                        .setCategory("All")
-                        .setAction("Atualizar Tudo")
-                        .setLabel("Atualizar Tudo " + me.getTitle().toString())
-                        .build());
-
-                if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null) {
-                    prepareModel();
-                } else {
-                    Util.getMenuFromInternet(me);
-                    Util.getLineFromInternet(me);
-                }
-
-            }
-        });
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
         this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));

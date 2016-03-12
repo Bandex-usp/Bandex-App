@@ -1,10 +1,13 @@
 package br.usp.ime.bandex;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -210,8 +213,67 @@ public class MoreDetailsActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_more_details, menu);
+        Log.d("[menu]", "onCreateOptionsMenu called!");
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+        //return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        Log.d("[menu]", "onPrepareOptionsMenu called!");
+        if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null || !Util.canEvaluate()) {
+            hideOption(menu, R.id.action_update_line);
+        } else {
+            showOption(menu, R.id.action_update_line);
+        }
+        return true;
+    }
+
+    public void showOption(Menu menu, int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(true);
+    }
+
+    private void hideOption(Menu menu, int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_update_line:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Fila")
+                        .setAction("Atualizar Fila")
+                        .setLabel("Atualizar Fila - " + getTitle().toString())
+                        .build());
+                Util.getLineFromInternet(this);
+                return true;
+            case R.id.action_update_menu:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Cardápio")
+                        .setAction("Atualizar Cardápio")
+                        .setLabel("Atualizar Cardápio - " + getTitle().toString())
+                        .build());
+                Util.getMenuFromInternet(this);
+                return true;
+            case R.id.action_settings:
+                tracker.send(new HitBuilders.EventBuilder()
+                        .setCategory("Preferências")
+                        .setAction("Ir Para Preferências")
+                        .setLabel("Ir Para Preferências - " + getTitle().toString())
+                        .build());
+                Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void setCustomActionBar() {
@@ -233,21 +295,6 @@ public class MoreDetailsActivity extends ActionBarActivity {
         tvActionBar.setText(this.getTitle());
         tvActionBar.setTypeface(face);
 
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        final ActionBarActivity me = this;
-        imageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                    tracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("All")
-                            .setAction("Atualizar Tudo")
-                            .setLabel("Atualizar Tudo " + me.getTitle().toString())
-                            .build());
-                    Util.getMenuFromInternet(me);
-            }
-        });
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
         this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));

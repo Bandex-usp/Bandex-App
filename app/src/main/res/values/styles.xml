@@ -8,4 +8,14 @@
     <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="android:textColorSecondary">@color/abc_secondary_text_material_light</item>
+        <item name="android:actionBarStyle">@style/MyActionBarTheme</item>
+    </style>
+
+    <style name="MyActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:background">@color/abc_secondary_text_material_light</item>
+    </style>
+
 </resources>

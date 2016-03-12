@@ -183,9 +183,6 @@ public class EvaluateLineActivity extends ActionBarActivity {
         tvActionBar.setText(this.getTitle());
         tvActionBar.setTypeface(face);
 
-        ImageButton imageButton = (ImageButton) mCustomView
-                .findViewById(R.id.imageButton);
-        imageButton.setVisibility(View.INVISIBLE);
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
         this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));

@@ -234,6 +234,12 @@ public class Util {
             return false;
         }
 
+        /*if (Util.canEvaluate()) {
+            if (caller instanceof MainActivity) {
+                ((MainActivity) caller).showOption(R.id.action_update_line);
+            }
+        }*/
+
         if (getPeriodToShowLine() != Periodo.NOTHING) {
             if (caller instanceof MainActivity) {
                 ((MainActivity) caller).showLineContentOnScreen();
@@ -369,7 +375,6 @@ public class Util {
         return !(getPeriodToShowLine() == Periodo.NOTHING || allClosed());
     }
 
-
     public static boolean allClosed() {
         boolean closed = true;
         for (Bandejao bandejao : Bandejao.possibleValues()) {
@@ -405,11 +410,11 @@ public class Util {
     }
 
     public static int getPeriodToShowLine() {
-        /*return getPeriodToShowMenu();*/ // P/ testes
-        if (inRangeOfLunch()) {
+        return getPeriodToShowMenu(); // P/ testes
+        /*if (inRangeOfLunch()) {
             return Periodo.LUNCH;
         } else if (inRangeOfDinner()) {
             return Periodo.DINNER;
-        } else return Periodo.NOTHING;
+        } else return Periodo.NOTHING;*/
     }
 }

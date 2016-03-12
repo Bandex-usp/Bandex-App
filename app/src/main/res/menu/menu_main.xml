@@ -1,8 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <!--
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="always" />
-        -->
+    <item android:title="TesteMenu" android:icon="@drawable/ic_setting_dark" >
+        <group android:menuCategory="container">
+            <item
+                android:id="@+id/action_update_line"
+                app:showAsAction="never"
+                android:title="Atualizar Fila" />
+
+            <item
+                android:id="@+id/action_update_menu"
+                app:showAsAction="never"
+                android:title="Atualizar Cardápio"/>
+
+            <item
+                android:id="@+id/action_settings"
+                app:showAsAction="never"
+                android:title="Preferências"/>
+        </group>
+    </item>
 </menu>
