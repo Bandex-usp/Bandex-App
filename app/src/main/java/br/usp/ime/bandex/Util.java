@@ -410,11 +410,11 @@ public class Util {
     }
 
     public static int getPeriodToShowLine() {
-        return getPeriodToShowMenu(); // P/ testes
-        /*if (inRangeOfLunch()) {
+        //return getPeriodToShowMenu(); // P/ testes
+        if (inRangeOfLunch()) {
             return Periodo.LUNCH;
         } else if (inRangeOfDinner()) {
             return Periodo.DINNER;
-        } else return Periodo.NOTHING;*/
+        } else return Periodo.NOTHING;
     }
 }
