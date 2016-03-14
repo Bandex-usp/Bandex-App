@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import br.usp.ime.bandex.R;
+import br.usp.ime.bandex.Util;
 import br.usp.ime.bandex.http.JSONPoster;
 
 /**
@@ -73,6 +74,7 @@ public class PostJsonTask extends AsyncTask<String, String, String> {
             editor.putString("nextEvaluationTime", new SimpleDateFormat("dd/MM/yyyy HH:mm").format(nextEvaluationTimeDate));
             editor.apply();
             Toast.makeText(caller.getApplicationContext(), getFinishMessage(), Toast.LENGTH_SHORT).show();
+            Util.getLineFromInternet(caller);
         } else {
             Toast.makeText(caller.getApplicationContext(), getErrorMessage(), Toast.LENGTH_SHORT).show();
         }

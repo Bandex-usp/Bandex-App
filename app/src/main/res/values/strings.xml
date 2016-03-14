@@ -17,7 +17,7 @@
     <string name="title_send">Enviar</string>
 
     <string name="title_evaluate_line">Avaliar Fila</string>
-    <string name="title_more_details">Mais detalhes</string>
+    <string name="title_more_details">Detalhes</string>
     <string name="title_great_line">Fila Muito Pequena</string>
     <string name="title_good_line">Fila Pequena</string>
     <string name="title_regular_line">Fila Média</string>
@@ -88,7 +88,7 @@
     <string name="preferences_line_cache">line_cache</string>
     <string name="preferences_menu_cache">menu_cache_new</string>
     <string name="preferences_entry_date_cache">entry_date_new</string>
-    <string name="title_activity_more_details">Mais detalhes</string>
+    <string name="title_activity_more_details">Detalhes</string>
 
     <string name="title_activity_preferences">Preferências</string>
 

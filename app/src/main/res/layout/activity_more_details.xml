@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_main_dish"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_main"
                     android:layout_gravity="top|left" />
             </LinearLayout>
@@ -117,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_meat"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_meat"
                     android:layout_gravity="top|left" />
 
@@ -125,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_side_dish"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_second"
                     android:layout_gravity="top|left" />
 
@@ -133,7 +133,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_salad"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_salad"
                     android:layout_gravity="top|left" />
 
@@ -141,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_optional"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_optional"
                     android:layout_gravity="top|left" />
 
@@ -149,14 +149,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_dessert"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_desert"
                     android:layout_gravity="top|left" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_calories"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_calories"
                     android:layout_gravity="top|left" />
             </LinearLayout>
@@ -201,7 +201,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/title_line_status"
+                    android:text=""
                     android:id="@+id/activity_more_details_tv_line_evaluation_category"
                     android:layout_gravity="top|center"
                     android:layout_weight="1"/>

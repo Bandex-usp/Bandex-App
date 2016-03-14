@@ -1,7 +1,10 @@
 package br.usp.ime.bandex;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -214,7 +217,7 @@ public class MoreDetailsActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         Log.d("[menu]", "onCreateOptionsMenu called!");
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_more_details, menu);
         return true;
         //return super.onCreateOptionsMenu(menu);
     }
@@ -297,7 +300,13 @@ public class MoreDetailsActivity extends ActionBarActivity {
 
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
-        this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+        Util.setOverflowButtonColor(this);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        if (upArrow != null && getSupportActionBar() != null) {
+            upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+        }
     }
 
 

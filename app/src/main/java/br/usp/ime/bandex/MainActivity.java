@@ -1,18 +1,26 @@
 package br.usp.ime.bandex;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +28,9 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.model.Bandex;
@@ -350,6 +361,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
+
+
+
+
     public void setCustomActionBar() {
         analytics = GoogleAnalytics.getInstance(this);
         analytics.setLocalDispatchPeriod(1800);
@@ -371,6 +386,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
-        this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+        Util.setOverflowButtonColor(this);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        if (upArrow != null && getSupportActionBar() != null) {
+            upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            this.getSupportActionBar().setBackgroundDrawable(this.getResources().getDrawable(R.drawable.actionbar_background2));
+        }
     }
 }

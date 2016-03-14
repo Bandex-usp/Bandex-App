@@ -3,9 +3,16 @@ package br.usp.ime.bandex;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -14,9 +21,11 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import br.usp.ime.bandex.model.Bandex;
 import br.usp.ime.bandex.model.BandexFactory;
@@ -220,14 +229,21 @@ public class Util {
                 JSONObject jsonRestaurant = jsonLine.getJSONObject("" + bandejao.value);
                 int status = (int) (jsonRestaurant.getDouble("line_status") + 0.5);
                 Date submitDate = null;
+                boolean temAvaliacao = false;
                 try {
-                    submitDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS-03:00").parse(jsonRestaurant.getString("last_submit"));
+                    submitDate = new SimpleDateFormat("-4712-01-01'T'00:00:00.000+00:00").parse(jsonRestaurant.getString("last_submit"));
                 } catch (ParseException e) {
+                    temAvaliacao = true;
                     e.printStackTrace();
+                    try {
+                        submitDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(jsonRestaurant.getString("last_submit"));
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
                 }
                 if (status > 4) status = 4;
                 BandexFactory.getRestaurant(bandejao).setLineStatus(status);
-                BandexFactory.getRestaurant(bandejao).setLastSubmit(submitDate);
+                BandexFactory.getRestaurant(bandejao).setLastSubmit(temAvaliacao ? submitDate : null);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -243,7 +259,7 @@ public class Util {
         if (getPeriodToShowLine() != Periodo.NOTHING) {
             if (caller instanceof MainActivity) {
                 ((MainActivity) caller).showLineContentOnScreen();
-            } else {
+            } else if (caller instanceof MoreDetailsActivity) {
                 ((MoreDetailsActivity) caller).updateLineContentOnScreen();
             }
         }
@@ -417,4 +433,58 @@ public class Util {
             return Periodo.DINNER;
         } else return Periodo.NOTHING;
     }
+
+    public static void removeOnGlobalLayoutListener(View v, ViewTreeObserver.OnGlobalLayoutListener listener) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            v.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+        }
+        else {
+            v.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+        }
+    }
+
+
+    static void findViewsWithText(List<View> outViews, ViewGroup parent, String targetDescription) {
+        if (parent == null || TextUtils.isEmpty(targetDescription)) {
+            return;
+        }
+        final int count = parent.getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = parent.getChildAt(i);
+            final CharSequence desc = child.getContentDescription();
+            if (!TextUtils.isEmpty(desc) && targetDescription.equals(desc.toString())) {
+                outViews.add(child);
+            } else if (child instanceof ViewGroup && child.getVisibility() == View.VISIBLE) {
+                findViewsWithText(outViews, (ViewGroup) child, targetDescription);
+            }
+        }
+    }
+
+
+    public static void setOverflowButtonColor(final Activity activity) {
+        final String overflowDescription = activity.getString(R.string.abc_action_menu_overflow_description);
+        final ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+        final ViewTreeObserver viewTreeObserver = decorView.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                final ArrayList<View> outViews = new ArrayList<View>();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                    decorView.findViewsWithText(outViews, overflowDescription,
+                            View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+                } else {
+                    findViewsWithText(outViews, decorView,
+                            overflowDescription);
+                }
+                if (outViews.isEmpty()) {
+                    return;
+                }
+                ImageView overflow= (ImageView) outViews.get(0);
+                overflow.setColorFilter(Color.WHITE);
+                removeOnGlobalLayoutListener(decorView,this);
+            }
+        });
+    }
+
+
 }
