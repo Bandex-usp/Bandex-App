@@ -3,12 +3,15 @@ package br.usp.ime.bandex;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flowsense.sdkflowsense.StartFlowSenseActivity;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -43,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     static TextView[][] tvInfo = new TextView[4][3]; // tvInfo[0][1] é a sobremesa do central
     public static GoogleAnalytics analytics;
     public static Tracker tracker;
+    public static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION = 1;
 
     /* Push Notifications */
     public boolean newInstalation() {
@@ -58,7 +63,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         prepareFrontEnd();
         setTextViews();
-
+        startFlowsense();
         if (newInstalation()) {
             Intent intent = new Intent(getApplicationContext(), NewFunctionalityActivity.class);
             startActivity(intent);
@@ -78,13 +83,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void prepareFrontEnd() {
         /* Setas para ir aos mais detalhes */
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/fontawesome-webfont.ttf");
-        TextView button = (TextView)findViewById(R.id.arrow1);
+        TextView button = (TextView) findViewById(R.id.arrow1);
         button.setTypeface(font);
-        TextView button2 = (TextView)findViewById(R.id.arrow2);
+        TextView button2 = (TextView) findViewById(R.id.arrow2);
         button2.setTypeface(font);
-        TextView button3 = (TextView)findViewById(R.id.arrow3);
+        TextView button3 = (TextView) findViewById(R.id.arrow3);
         button3.setTypeface(font);
-        TextView button4 = (TextView)findViewById(R.id.arrow4);
+        TextView button4 = (TextView) findViewById(R.id.arrow4);
         button4.setTypeface(font);
 
         Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
@@ -100,6 +105,32 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             Util.jsonMenuToModel(this, menu);
         }
     }
+
+    public void startFlowsense() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+            }
+        } else {
+            new StartFlowSenseActivity(this.getBaseContext());
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    new StartFlowSenseActivity(this.getBaseContext());
+                }
+            }
+        }
+    }
+
 
     @Override
     protected void onResume() {
@@ -284,8 +315,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void setOnClickListeners() {
         LinearLayout btn_central_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_central);
         LinearLayout btn_quimica_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_quimica);
-        LinearLayout btn_fisica_more_details =  (LinearLayout) findViewById(R.id.activity_main_ll_fisica);
-        LinearLayout btn_pco_more_details =  (LinearLayout) findViewById(R.id.activity_main_ll_pco);
+        LinearLayout btn_fisica_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_fisica);
+        LinearLayout btn_pco_more_details = (LinearLayout) findViewById(R.id.activity_main_ll_pco);
         Button btn_evaluate_line = (Button) findViewById(R.id.activity_main_btn_evaluate_line);
 
         btn_pco_more_details.setOnClickListener(this);
@@ -305,7 +336,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
+    public boolean onPrepareOptionsMenu(Menu menu) {
         Log.d("[menu]", "onPrepareOptionsMenu called!");
         if (BandexFactory.getRestaurant(Bandejao.CENTRAL) == null || !Util.canEvaluate()) {
             hideOption(menu, R.id.action_update_line);
@@ -315,14 +346,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return true;
     }
 
-    public void showOption(Menu menu, int id)
-    {
+    public void showOption(Menu menu, int id) {
         MenuItem item = menu.findItem(id);
         item.setVisible(true);
     }
 
-    private void hideOption(Menu menu, int id)
-    {
+    private void hideOption(Menu menu, int id) {
         MenuItem item = menu.findItem(id);
         item.setVisible(false);
     }
@@ -353,16 +382,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         .setAction("Ir Para Preferências")
                         .setLabel("Ir Para Preferências - " + getTitle().toString())
                         .build());
-                        Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
-                        startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-
 
 
     public void setCustomActionBar() {
@@ -380,7 +406,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         View mCustomView = mInflater.inflate(R.layout.custom_actionbar, null);
         TextView tvActionBar = (TextView) mCustomView.findViewById(R.id.title_text_action_bar);
-        Typeface face= Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Bold.ttf");
+        Typeface face = Typeface.createFromAsset(this.getAssets(), "fonts/Raleway-Bold.ttf");
         tvActionBar.setText(this.getTitle());
         tvActionBar.setTypeface(face);
 

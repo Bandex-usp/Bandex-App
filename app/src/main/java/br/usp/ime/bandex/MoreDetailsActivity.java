@@ -107,6 +107,15 @@ public class MoreDetailsActivity extends ActionBarActivity {
         });
     }
 
+    public void prepareModel() {
+        String menu = Util.getMenuFromCache(this);
+        if (menu == null) {
+            Util.getMenuFromInternet(this);
+        } else {
+            Util.jsonMenuToModel(this, menu);
+        }
+    }
+
     public void showClosed() {
         ll_info_cardapio.setVisibility(View.INVISIBLE);
         TextView tv = (TextView) findViewById(R.id.activity_more_details_tv_main);

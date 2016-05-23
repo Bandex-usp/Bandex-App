@@ -4,12 +4,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.c2dm.permission.RECEIVE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
 
     <!--
       IMPORTANT: Change "com.parse.starter.permission.C2D_MESSAGE" in the lines below
@@ -28,6 +31,23 @@
         android:label="@string/app_name"
         android:logo="@mipmap/usp_logo"
         android:theme="@style/AppTheme" >
+
+        <!-- Integração - Flowsense -->
+        <receiver
+            android:name="com.flowsense.sdkflowsense.receivers_fs.BootCompletedReceiver_fs" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.flowsense.sdkflowsense.services_fs.LocationService_fs"
+            android:enabled="true" >
+        </service>
+
+        <meta-data android:name="FlowSense_campaign" android:value="aa2ffd97-e6a0-461b-a345-bbb36eab6e86" />
+
+        <!-- Integração - Flowsense -->
 
         <!--
         Add the following meta-data for devices running Google Play service.
