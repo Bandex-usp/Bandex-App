@@ -209,7 +209,7 @@ public class EvaluateLineActivity extends ActionBarActivity {
         mActionBar.setCustomView(mCustomView);
         mActionBar.setDisplayShowCustomEnabled(true);
         Util.setOverflowButtonColor(this);
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
         if (upArrow != null && getSupportActionBar() != null) {
             upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);

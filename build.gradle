@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,5 +15,21 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url "s3://mavensdk/releases"
+            credentials(AwsCredentials) {
+                accessKey = getMavenCredentials().get(0)
+                secretKey = getMavenCredentials().get(1)
+            }
+        }
     }
 }
+
+def getMavenCredentials() {
+    File mavenSettings = new File(rootDir, "/flowsense_credentials.xml")
+    def xmlSlurper = new XmlSlurper()
+    def output = xmlSlurper.parse(mavenSettings)
+    return [output."servers"."server"."username".toString(),
+            output."servers"."server"."password".toString()]
+}
+

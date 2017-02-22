@@ -14,7 +14,7 @@
     </style>
 
     <style name="MyActionButtonOverflow" parent="android:style/Widget.Holo.ActionButton.Overflow">
-        <item name="android:src">@drawable/abc_ic_menu_moreoverflow_mtrl_alpha</item>
+        <item name="android:src">@drawable/abc_ic_menu_overflow_material</item>
     </style>
 
     <!--style name="MyActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
