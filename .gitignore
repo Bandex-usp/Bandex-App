@@ -1,4 +1,4 @@
-./flowsense_credentials.xml
+flowsense_credentials.xml
 .gradle
 /local.properties
 /.idea/workspace.xml
