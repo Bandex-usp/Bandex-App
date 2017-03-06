@@ -28,13 +28,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.flowsense.sdkflowsense.StartFlowSenseActivity;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import com.flowsense.flowsensesdk.StartFlowsenseService;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import br.usp.ime.bandex.Util.Bandejao;
 import br.usp.ime.bandex.model.Bandex;
@@ -53,6 +59,28 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public boolean newInstalation() {
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
         return sharedPreferences.getBoolean("newUser", true);
+    }
+
+    private String getFlowsenseToken() {
+        InputStream input = null;
+        Properties prop = new Properties();
+        String token = "";
+        try {
+            input = this.getAssets().open("my.properties");
+            prop.load(input);
+            token = prop.getProperty("token_flowsense");
+        } catch (IOException io) {
+            io.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return token;
     }
 
     @Override
@@ -114,7 +142,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         MY_PERMISSIONS_ACCESS_FINE_LOCATION);
             }
         } else {
-            new StartFlowSenseActivity(this.getBaseContext());
+            new StartFlowsenseService(this.getFlowsenseToken(), this.getBaseContext());
         }
 
     }
@@ -125,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    new StartFlowSenseActivity(this.getBaseContext());
+                    new StartFlowsenseService(this.getFlowsenseToken(), this.getBaseContext());
                 }
             }
         }

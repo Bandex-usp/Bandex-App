@@ -14,8 +14,8 @@ android {
         applicationId "br.usp.ime.bandex"
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
     }
     buildTypes {
         release {
@@ -45,6 +45,5 @@ dependencies {
     compile 'com.parse:parse-android:1.+'
     compile 'com.google.android.gms:play-services:9.8.0'
     compile 'com.android.support:design:25.0.1'
-    compile files('libs/SdkFlowsense_1.5.0.jar')
-    compile 'FlowsenseSDK:sdk:3.0.1.+'
+    compile 'FlowsenseSDK:sdk:3.0.1.6'
 }

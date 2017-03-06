@@ -5,3 +5,4 @@ flowsense_credentials.xml
 /.idea/libraries
 .DS_Store
 /build
+app/src/main/assets/my.properties
